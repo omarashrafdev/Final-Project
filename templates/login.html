@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <small>{{ error }}</small>
+    <form method="POST" action="/Login">
+        <input name="username" type="text">
+        <input name="password" type="password">
+        <input type="submit">
+    </form>
+{% endblock %}

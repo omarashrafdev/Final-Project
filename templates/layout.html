@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/styles.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    {% if session["user_id"] %}
+    <header class="sidebar">
+        <div class="title">
+            <a href="" class="logo_name">
+                <div class="logo">
+                    <img src="/static/media/logo.png" alt="logo">
+                </div>
+                <div class="brand_info">
+                    <div class="name"><h1>Brand Name</h1></div>
+                    <div class="description"><p>Clinic management tool</p></div>
+                </div>
+            </a>
+        </div>
+        <a href="" class="sidebar_active sidebar_hover sidebar_element">
+            <span class="material-icons md-48">speed</span>
+            <p>Dashboard</p>
+        </a>
+        <a href="" class="sidebar_hover sidebar_element">
+            <span class="material-icons md-48">calendar_month</span>
+            <p>Calendar</p>
+        </a>
+        <a href="" class="sidebar_hover sidebar_element">
+            <span class="material-icons md-48">group</span>
+            <p>Patient list</p>
+        </a>
+        <a href="" class="sidebar_hover sidebar_element">
+            <span class="material-icons md-48">chat</span>
+            <p>Messages</p>
+        </a>
+        <a href="" class="sidebar_hover sidebar_element">
+            <span class="material-icons md-48">payments</span>
+            <p>Payment information</p>
+        </a>
+        <a href="" class="sidebar_hover sidebar_element">
+            <span class="material-icons md-48">settings</span>
+            <p>Settings</p>
+        </a>
+        <div class="float-bottom">
+            <a href="" class="help sidebar_element">
+                <span class="material-icons md-48">help</span>
+                <p>Help ?</p>
+            </a>
+            <hr>
+            <div class="profile">
+                <div class="profile_link">
+                    <a href="">
+                        <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_pic.jpg"></div>
+                        <div class="profile_info">
+                            <h1>Omar Ashraf</h1>
+                            <p>Developer</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="expand_icon">
+                    <a href="">
+                        <span class="material-icons md-48">expand_more</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    {% else %}
+    <!--
+        Login section
+    -->
+    {% endif %}
+    
+
+    <section class="page">
+        {% block main %}{% endblock %}
+    </section>
+
+</body>
+</html>
