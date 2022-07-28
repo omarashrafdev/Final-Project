@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+    <form method="POST" action="/Register" class="login-form">
+        <small>{{ error }}</small>
+        <h1>Sign up</h1>
+        <div>
+            <input class="text-field" name="username" id="username" type="text" placeholder="Username" required>
+        </div>
+        <div>
+            <input class="text-field" name="first_name" type="text" placeholder="First name" required>
+        </div>
+        <div>
+            <input class="text-field" name="last_name" type="text" placeholder="Last name" required>
+        </div>
+        <div>
+            <input class="text-field" name="email" type="email" placeholder="Email address" required>
+        </div>
+        <div>
+            <input class="text-field" name="phone_number" type="number" placeholder="Phone number" required>
+        </div>
+        <div>
+            <select class="text-field">
+                <option selected disabled>Select your city</option>
+                {% for city in CITIES %}
+                    <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <input class="text-field" name="date_of_birth" type="date" placeholder="Date of birth" required>
+        </div>
+        <div>
+            <input class="text-field" name="profile_pic" type="file" id="file" required>
+        </div>
+        <div>
+            <input class="text-field" name="password1" id="password1" type="password" placeholder="Password" required>
+        </div>
+        <div>
+            <input class="text-field" name="password2" id="password2" type="password" placeholder="Confirm password" required>
+        </div>
+        <div>
+            <input class="button" type="submit" value="Register">
+        </div>
+        <p>Already have an account? <a href="/Login" style="color:#0d53fc;">Sign in!</a></p>
+    </form>
+    <script>
+        var fileInput = document.getElementById('file');
+        fileInput.onchange = function() {
+            var filePath = fileInput.value;
+            fileNameArray = filePath.split("\\");
+            fileName = fileNameArray[fileNameArray.length-1];
+        
+            // Allowed file types
+            var allowedExtensions =["jpg", "jpeg", "png"];
+            
+            fileExtention = getFileExtention(fileName);
+
+            if (fileExtention != allowedExtensions[0] && fileExtention != allowedExtensions[1] && fileExtention != allowedExtensions[2]) {
+                alert('File type is not supported\nOnly (jpg, jpeg, png) files are supported');
+                document.getElementById('file').value = null;
+            }
+        }
+
+        function getFileExtention(filename) {
+            return filename.split('.').pop();
+        }
+    </script>
+{% endblock %}
+
+{% block style %}
+    .page {
+        padding-left: 0px;
+    }
+    
+    small {
+        color: red;
+        margin-bottom: 20px;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .login-form h1 {
+        margin-bottom: 10px;
+        font-size: 50px;
+    }
+
+    .login-form p {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .text-field {
+        width: 200px;
+        height: 20px;
+
+        padding: 10px;
+        margin-bottom: 10px;
+
+        border: 1px solid #0d53fc;
+        border-radius: 4px;
+    }
+
+    .button {
+        cursor: pointer;
+        border: 0;
+        border-radius: 4px;
+        font-weight: 600;
+        margin: 0 10px;
+        width: 200px;
+        padding: 10px 0;
+        box-shadow: 0 0 20px rgba(13, 83, 252, 0.2);
+        transition: 0.4s;
+
+        color: rgb(104, 85, 224);
+        background-color: rgba(255, 255, 255, 1);
+        border: 1px solid #0d53fc;
+    }
+
+    .button:hover {
+        color: white;
+        width:;
+        box-shadow: 0 0 20px rgba(13, 83, 252, 0.6);
+        background-color: #0d53fc;
+    }
+{% endblock %}
