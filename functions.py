@@ -1,6 +1,8 @@
+from datetime import date
 import re
 from flask import redirect, session
 from functools import wraps
+from math import floor
 
 def login_required(f):
     """
@@ -23,3 +25,12 @@ def strong_password_check(password):
             return 1
     else:
         return 2
+    
+def Years_Between(date1, date2):
+    date1 = str(date1)
+    date2 = str(date2)
+    
+    years1 = int(date1.split("-")[0]) + (int(date1.split("-")[1])/12) + (int(date1.split("-")[2])/365)
+    years2 = int(date2.split("-")[0]) + (int(date2.split("-")[1])/12) + (int(date2.split("-")[2])/365)
+    
+    return floor(abs(years1 - years2))

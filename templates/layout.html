@@ -8,6 +8,8 @@
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <style>{% block style %}{% endblock %}</style>
+
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -57,7 +59,7 @@
             <div class="profile">
                 <div class="profile_link">
                     <a href="">
-                        <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_pic.jpg"></div>
+                        <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_picture.png"></div>
                         <div class="profile_info">
                             <h1>Omar Ashraf</h1>
                             <p>Developer</p>
@@ -65,8 +67,11 @@
                     </a>
                 </div>
                 <div class="expand_icon">
-                    <a href="">
-                        <span class="material-icons md-48">expand_more</span>
+                    <a href="/Logout">
+                        logout
+                        <!--
+                            <span class="material-icons md-48">expand_more</span>
+                        -->
                     </a>
                 </div>
             </div>

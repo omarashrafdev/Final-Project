@@ -5,10 +5,81 @@
 {% endblock %}
 
 {% block main %}
-    <small>{{ error }}</small>
-    <form method="POST" action="/Login">
-        <input name="username" type="text">
-        <input name="password" type="password">
-        <input type="submit">
+    <form method="POST" action="/Login" class="login-form">
+        <small>{{ error }}</small>
+        <h1>Sign in</h1>
+        <div>
+            <input class="text-field" name="username" type="text" placeholder="Username">
+        </div>
+        <div>
+            <input class="text-field" name="password" type="password" placeholder="Password">
+        </div>
+        <div>
+            <input class="button" type="submit" value="Login">
+        </div>
+        <p>Don't have an account? <a href="/Register" style="color:#0d53fc;">Sign up!</a></p>
     </form>
+{% endblock %}
+
+{% block style %}
+    .page {
+        padding-left: 0px;
+    }
+
+    small {
+        color: red;
+        margin-bottom: 20px;
+    }
+    
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .login-form h1 {
+        margin-bottom: 10px;
+        font-size: 50px;
+    }
+
+    .login-form p {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .text-field {
+        width: 200px;
+        height: 20px;
+
+        padding: 10px;
+        margin-bottom: 10px;
+
+        border: 1px solid #0d53fc;
+        border-radius: 4px;
+    }
+
+    .button {
+        cursor: pointer;
+        border: 0;
+        border-radius: 4px;
+        font-weight: 600;
+        margin: 0 10px;
+        width: 200px;
+        padding: 10px 0;
+        box-shadow: 0 0 20px rgba(13, 83, 252, 0.2);
+        transition: 0.4s;
+
+        color: rgb(104, 85, 224);
+        background-color: rgba(255, 255, 255, 1);
+        border: 1px solid #0d53fc;
+    }
+
+    .button:hover {
+        color: white;
+        width:;
+        box-shadow: 0 0 20px rgba(13, 83, 252, 0.6);
+        background-color: #0d53fc;
+    }
 {% endblock %}

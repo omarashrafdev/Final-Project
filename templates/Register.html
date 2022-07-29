@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-    <form method="POST" action="/Register" class="login-form">
+    <form method="POST" action="/Register" class="login-form" enctype="multipart/form-data">
         <small>{{ error }}</small>
         <h1>Sign up</h1>
         <div>
@@ -24,7 +24,7 @@
             <input class="text-field" name="phone_number" type="number" placeholder="Phone number" required>
         </div>
         <div>
-            <select class="text-field">
+            <select class="text-field" name="city">
                 <option selected disabled>Select your city</option>
                 {% for city in CITIES %}
                     <option value="{{ city }}">{{ city }}</option>
@@ -35,7 +35,7 @@
             <input class="text-field" name="date_of_birth" type="date" placeholder="Date of birth" required>
         </div>
         <div>
-            <input class="text-field" name="profile_pic" type="file" id="file" required>
+            <input class="text-field" name="profile_picture[]" type="file" id="profile_pic" required>
         </div>
         <div>
             <input class="text-field" name="password1" id="password1" type="password" placeholder="Password" required>
@@ -49,7 +49,7 @@
         <p>Already have an account? <a href="/Login" style="color:#0d53fc;">Sign in!</a></p>
     </form>
     <script>
-        var fileInput = document.getElementById('file');
+        var fileInput = document.getElementById('profile_pic');
         fileInput.onchange = function() {
             var filePath = fileInput.value;
             fileNameArray = filePath.split("\\");
