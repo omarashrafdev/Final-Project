@@ -108,9 +108,9 @@ def Register():
         
         # Validate password strength
         if strong_password_check(password) == 1:
-            return render_template("Register.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.")
+            return render_template("Register.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.", CITIES=CITIES)
         elif strong_password_check(password) == 2:
-            return render_template("Register.html", error="Your password must be at least 8 characters long. Please try another.",  CITIES=CITIES)
+            return render_template("Register.html", error="Your password must be at least 8 characters long. Please try another.", CITIES=CITIES)
         
         password_hash = generate_password_hash(password)
         
@@ -178,3 +178,53 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+
+@app.route("/Settings")
+def settings():
+    return render_template("settings.html")
+
+
+@app.route("/Profile")
+def profile():
+    return render_template("pending.html")
+
+
+@app.route("/ChangePassword", methods=["GET", "POST"])
+def change_password():
+    if request.method == "GET":
+        return render_template("change_password.html")
+    else:
+        old_password = request.form.get("old_password")
+        
+        # Validate current password
+        data = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+        if not check_password_hash(data[0]["password_hash"], old_password):
+            return render_template("change_password.html", error="Wrong password. Please try again.")
+        
+        # Validate passwords match
+        if request.form.get("password1") != request.form.get("password2"):
+            return render_template("change_password.html", error="Passwords must match. Please try again.")
+        
+        password = request.form.get("password1")
+        
+        # Validate password strength
+        if strong_password_check(password) == 1:
+            return render_template("change_password.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.")
+        elif strong_password_check(password) == 2:
+            return render_template("change_password.html", error="Your password must be at least 8 characters long. Please try another.")
+
+        # Update DB
+        password_hash = generate_password_hash(password)
+        db.execute("UPDATE users SET password_hash=? WHERE id=?", password_hash, session["user_id"])
+        return render_template("change_password.html", success="Password changed successfully.")
+        
+
+@app.route("/ChangeEmail")
+def change_email():
+    return render_template("pending.html")
+
+
+@app.route("/EditInfo")
+def edit_info():
+    return render_template("pending.html")

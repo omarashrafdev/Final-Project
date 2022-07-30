@@ -161,7 +161,7 @@ a, img {
 .expand_icon {
     position: absolute;
     right: 10px;
-    top: 25%;
+    top: 30%;
 }
 
 @media (max-width: 1000px) and (min-width: 801px){

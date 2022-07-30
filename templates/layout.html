@@ -26,30 +26,8 @@
                 </div>
             </a>
         </div>
-        <a href="" class="sidebar_active sidebar_hover sidebar_element">
-            <span class="material-icons md-48">speed</span>
-            <p>Dashboard</p>
-        </a>
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">calendar_month</span>
-            <p>Calendar</p>
-        </a>
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">group</span>
-            <p>Patient list</p>
-        </a>
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">chat</span>
-            <p>Messages</p>
-        </a>
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">payments</span>
-            <p>Payment information</p>
-        </a>
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">settings</span>
-            <p>Settings</p>
-        </a>
+        {% block sidebar %}{% endblock %}
+        
         <div class="float-bottom">
             <a href="" class="help sidebar_element">
                 <span class="material-icons md-48">help</span>
@@ -58,21 +36,16 @@
             <hr>
             <div class="profile">
                 <div class="profile_link">
-                    <a href="">
+                    <a href="/Profile">
                         <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_picture.png"></div>
                         <div class="profile_info">
                             <h1>Omar Ashraf</h1>
-                            <p>Developer</p>
+                            <p>Doctor</p>
                         </div>
                     </a>
                 </div>
                 <div class="expand_icon">
-                    <a href="/Logout">
-                        logout
-                        <!--
-                            <span class="material-icons md-48">expand_more</span>
-                        -->
-                    </a>
+                    <a href="/Logout"><span class="material-icons md-48">logout</span></a>
                 </div>
             </div>
         </div>
