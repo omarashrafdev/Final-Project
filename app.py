@@ -1,4 +1,5 @@
 # Import needed functions
+from crypt import methods
 import os
 import smtplib
 
@@ -48,6 +49,7 @@ IS_VERIFIED = 0
 def index():
     # Essential variables
     user_id = session["user_id"]
+    print(session["name"])
     
     # Return homapege view
     return render_template("index.html")
@@ -61,7 +63,7 @@ def Register():
     if request.method == "GET":
         return render_template("Register.html",  CITIES=CITIES)
     else:
-        # Get username and password
+        # Data input from the form
         first_name = request.form.get("first_name")
         last_name = request.form.get("last_name")
         email = request.form.get("email")
@@ -76,63 +78,50 @@ def Register():
             return render_template("Register.html", error="Username already in use. Please try another one.", 
                                      CITIES=CITIES)
         
-        print("Check point 1")
-        
         # Validate email duplication
         data = db.execute("SELECT * FROM users WHERE email = ? AND is_doctor = TRUE", email)
         if len(data) != 0:
             return render_template("Register.html", error="Email Address is already in use. Please try another one.", 
                                      CITIES=CITIES)
         
-        print("Check point 2")
-        
         # Validate phone number duplication
         data = db.execute("SELECT * FROM users WHERE phone_number = ? AND is_doctor = TRUE", phone_number)
         if len(data) != 0:
             return render_template("Register.html", error="Phone number is already in use. Please try another one.", 
                                      CITIES=CITIES)
-        print("Check point 3")
             
         # Validate user's age (older than 15)
         if Years_Between(date_of_birth, TODAY) < 15:
             return render_template("Register.html", error="You have to be older than 15 years old to use", 
                                      CITIES=CITIES)
         
-        print("Check point 4")
-        
         # Validate password match
         if request.form.get("password1") != request.form.get("password2"):
             return render_template("Register.html", error="Passwords don't match. Please try again.", 
                                      CITIES=CITIES)
 
-        password = request.form.get("password1")
-        
-        print("Check point 5")
-        
         # Validate password strength
+        password = request.form.get("password1")
         if strong_password_check(password) == 1:
             return render_template("Register.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.", CITIES=CITIES)
         elif strong_password_check(password) == 2:
             return render_template("Register.html", error="Your password must be at least 8 characters long. Please try another.", CITIES=CITIES)
-        
         password_hash = generate_password_hash(password)
         
-        print("Check point 6")
-        
+        # Store profile pic in static media
         profile_picture = request.files['profile_picture[]']
-        print("Check point 6.1")
         profile_picture.save("static/media/profile_picture.png")
-        
-        print("Check point 7")
         
         # Store user's data in the database
         with open ("static/media/profile_picture.png", "rb") as pic:
             db.execute("INSERT INTO users (username, password_hash, first_name, last_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified) VALUES (?,?,?,?,?,?,?,TRUE,?,?,FALSE)",
                 username, password_hash, first_name, last_name, city, phone_number, email, date_of_birth, pic.read())
-        
-        print("Check point 8")
-        
+            
+        # Session variables
         session["user_id"] = db.execute("SELECT * FROM users WHERE username = ?", username)[0]["id"]
+        session["name"] = first_name + " " + last_name
+        
+        # Redirect to home page
         return redirect("/")
         
         
@@ -161,6 +150,7 @@ def login():
         
         # Store the user id in the session's data
         session["user_id"] = data[0]["id"]
+        session["name"] = data[0]["first_name"] + " " + data[0]["last_name"]
         
         # Store the profile picture
         with open("static/media/profile_picture.png", "wb") as pic:
@@ -198,6 +188,7 @@ def change_password():
     if request.method == "GET":
         return render_template("change_password.html")
     else:
+        # Get old password from the user
         old_password = request.form.get("old_password")
         
         # Validate current password
@@ -209,17 +200,18 @@ def change_password():
         if request.form.get("password1") != request.form.get("password2"):
             return render_template("change_password.html", error="Passwords must match. Please try again.")
         
-        password = request.form.get("password1")
-        
         # Validate password strength
+        password = request.form.get("password1")
         if strong_password_check(password) == 1:
             return render_template("change_password.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.")
         elif strong_password_check(password) == 2:
             return render_template("change_password.html", error="Your password must be at least 8 characters long. Please try another.")
 
-        # Update DB
+        # Update DB to the new password
         password_hash = generate_password_hash(password)
         db.execute("UPDATE users SET password_hash=? WHERE id=?", password_hash, session["user_id"])
+        
+        # Return the success message to the user
         return render_template("change_password.html", success="Password changed successfully.")
         
 
@@ -228,6 +220,7 @@ def change_email():
     if request.method == "GET":
         return render_template("change_email.html")
     else:
+        # Get the new email from the user
         email = request.form.get("email")
         
         # Validate email duplication
@@ -237,7 +230,6 @@ def change_email():
 
         # The message
         message = "\nThis is your code: " + str(CODE)
-        print(message)
         
         # Send message to the new email
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -246,6 +238,7 @@ def change_email():
         server.sendmail(os.environ["EMAIL"], email, message)
         server.close()
         
+        # Redirect to the verify function to verify the new email with the code
         return redirect(url_for("verify_new_email", email=email))
     
 
@@ -254,6 +247,7 @@ def verify_new_email(email):
     if request.method == "GET":
         return render_template("verify_new_email.html", email=email)
     else:
+        # Get the code the user has entered
         code = int(request.form.get("code"))
 
         # Validate code
@@ -263,9 +257,15 @@ def verify_new_email(email):
         # Update the email in the database
         db.execute("UPDATE users SET email=? WHERE id=?", email, session["user_id"])
         
+        # Redirect to home page
         return redirect("/")
     
 
-@app.route("/EditInfo")
+@app.route("/EditInfo", methods=["GET", "POST"])
 def edit_info():
-    return render_template("pending.html")
+    if request.method == "GET":
+        return render_template("pending.html")
+    else:
+        ...
+    
+    
