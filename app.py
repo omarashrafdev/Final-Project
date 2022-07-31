@@ -1,10 +1,13 @@
 # Import needed functions
 import os
+import smtplib
+
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_session import Session
 from cs50 import SQL
 from datetime import date
 from werkzeug.security import check_password_hash, generate_password_hash
+from random import randint
 from functions import login_required, strong_password_check, Years_Between
 
 # Configure application
@@ -15,7 +18,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.run(debug=True)
 
 # Declare GLOBAL varable for the email verification function
-#CODE = randint(000000, 999999)
+CODE = randint(111111, 999999)
 
 # Store the URL generated with the secret key from the environment variable to the program
 #s = URLSafeTimedSerializer(os.environ["SECRET_KEY"])
@@ -220,10 +223,48 @@ def change_password():
         return render_template("change_password.html", success="Password changed successfully.")
         
 
-@app.route("/ChangeEmail")
+@app.route("/ChangeEmail", methods=["GET", "POST"])
 def change_email():
-    return render_template("pending.html")
+    if request.method == "GET":
+        return render_template("change_email.html")
+    else:
+        email = request.form.get("email")
+        
+        # Validate email duplication
+        data = db.execute("SELECT * FROM users WHERE email=?", email)
+        if len(data) != 0:
+            return render_template("change_email.html", error="Email already in use. Please try again.")
 
+        # The message
+        message = "\nThis is your code: " + str(CODE)
+        print(message)
+        
+        # Send message to the new email
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
+        server.sendmail(os.environ["EMAIL"], email, message)
+        server.close()
+        
+        return redirect(url_for("verify_new_email", email=email))
+    
+
+@app.route("/VerifyNewEmail/<email>", methods=["GET", "POST"])
+def verify_new_email(email):
+    if request.method == "GET":
+        return render_template("verify_new_email.html", email=email)
+    else:
+        code = int(request.form.get("code"))
+
+        # Validate code
+        if code != CODE:
+            return render_template("verify_new_email.html", error="Wrong code. New one was sent.", email=email)
+        
+        # Update the email in the database
+        db.execute("UPDATE users SET email=? WHERE id=?", email, session["user_id"])
+        
+        return redirect("/")
+    
 
 @app.route("/EditInfo")
 def edit_info():
