@@ -264,7 +264,8 @@ def verify_new_email(email):
 @app.route("/EditInfo", methods=["GET", "POST"])
 def edit_info():
     if request.method == "GET":
-        return render_template("pending.html")
+        data = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
+        return render_template("edit_info.html", data=data, CITIES=CITIES)
     else:
         ...
     

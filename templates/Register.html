@@ -24,7 +24,7 @@
             <input class="text-field" name="phone_number" type="number" placeholder="Phone number" required>
         </div>
         <div>
-            <select class="text-field" name="city">
+            <select class="text-field select" name="city">
                 <option selected disabled>Select your city</option>
                 {% for city in CITIES %}
                     <option value="{{ city }}">{{ city }}</option>
@@ -109,6 +109,9 @@
 
         border: 1px solid #0d53fc;
         border-radius: 4px;
+    }
+    .select {
+        height: 40px;
     }
 
     .button {
