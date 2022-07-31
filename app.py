@@ -49,7 +49,6 @@ IS_VERIFIED = 0
 def index():
     # Essential variables
     user_id = session["user_id"]
-    print(session["name"])
     
     # Return homapege view
     return render_template("index.html")
@@ -178,9 +177,10 @@ def settings():
     return render_template("settings.html")
 
 
-@app.route("/Profile")
-def profile():
-    return render_template("pending.html")
+@app.route("/Profile-<int:id>")
+def profile(id):
+    data = db.execute("SELECT * FROM users WHERE id=?", id)
+    return render_template("profile.html", data=data)
 
 
 @app.route("/ChangePassword", methods=["GET", "POST"])
@@ -267,5 +267,4 @@ def edit_info():
         return render_template("pending.html")
     else:
         ...
-    
     

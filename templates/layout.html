@@ -36,7 +36,7 @@
             <hr>
             <div class="profile">
                 <div class="profile_link">
-                    <a href="/Profile">
+                    <a href="/Profile-{{ session["user_id"] }}">
                         <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_picture.png"></div>
                         <div class="profile_info">
                             <h1>{{ session["name"] }}</h1>

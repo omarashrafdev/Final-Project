@@ -53,12 +53,15 @@ a, img {
 
 .sidebar_active {
     background-color: var(--DarkBlue);
+    transition: 0.4s;
 }
 .sidebar_active span, .sidebar_active p{
     color: var(--White);
+    transition: 0.4s;
 }
 .sidebar a {
     padding: 5px;
+    transition: 0.4s;
 }
 .sidebar_hover:hover {
     background-color: var(--DarkBlue);
