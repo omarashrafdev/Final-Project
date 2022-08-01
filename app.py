@@ -38,17 +38,14 @@ CITIES = ["Alexandria", "Aswan", "Asyut", "Beheira", "Beni Suef", "Cairo", "Daka
 # Today's date to pass to the forms
 TODAY = date.today()
 
-# Doctor Check (1=True, 0=False)
-IS_DOCTOR = 0
-# Email Verify Check (1=True, 0=False)
-IS_VERIFIED = 0
-
 
 @app.route("/")
 @login_required
 def index():
     # Essential variables
     user_id = session["user_id"]
+    # if not db.execute("SELECT is_verified FROM users WHERE id=?", user_id)[0]["is_verified"]:
+        # return redirect("/")
     
     # Return homapege view
     return render_template("index.html")
@@ -63,28 +60,28 @@ def Register():
         return render_template("Register.html",  CITIES=CITIES)
     else:
         # Data input from the form
-        first_name = request.form.get("first_name")
-        last_name = request.form.get("last_name")
+        full_name = request.form.get("full_name")
         email = request.form.get("email")
         phone_number = request.form.get("phone_number")
         city = request.form.get("city")
         username = request.form.get("username")
         date_of_birth = request.form.get("date_of_birth")
+        user_type = request.form.get("user_type")
         
         # Validate username duplication
-        data = db.execute("SELECT * FROM users WHERE username = ? AND is_doctor = TRUE", username)
+        data = db.execute("SELECT * FROM users WHERE username = ?", username)
         if len(data) != 0:
             return render_template("Register.html", error="Username already in use. Please try another one.", 
                                      CITIES=CITIES)
         
         # Validate email duplication
-        data = db.execute("SELECT * FROM users WHERE email = ? AND is_doctor = TRUE", email)
+        data = db.execute("SELECT * FROM users WHERE email = ?", email)
         if len(data) != 0:
             return render_template("Register.html", error="Email Address is already in use. Please try another one.", 
                                      CITIES=CITIES)
         
         # Validate phone number duplication
-        data = db.execute("SELECT * FROM users WHERE phone_number = ? AND is_doctor = TRUE", phone_number)
+        data = db.execute("SELECT * FROM users WHERE phone_number = ?", phone_number)
         if len(data) != 0:
             return render_template("Register.html", error="Phone number is already in use. Please try another one.", 
                                      CITIES=CITIES)
@@ -112,13 +109,19 @@ def Register():
         profile_picture.save("static/media/profile_picture.png")
         
         # Store user's data in the database
-        with open ("static/media/profile_picture.png", "rb") as pic:
-            db.execute("INSERT INTO users (username, password_hash, first_name, last_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified) VALUES (?,?,?,?,?,?,?,TRUE,?,?,FALSE)",
-                username, password_hash, first_name, last_name, city, phone_number, email, date_of_birth, pic.read())
+        if user_type == "doctor": # For doctors
+            with open ("static/media/profile_picture.png", "rb") as pic:
+                db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified) VALUES (?,?,?,?,?,?,TRUE,?,?,FALSE)",
+                    username, password_hash, full_name, city, phone_number, email, date_of_birth, pic.read())
+        else: # For patients
+            with open ("static/media/profile_picture.png", "rb") as pic:
+                db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified) VALUES (?,?,?,?,?,?,FALSE,?,?,FALSE)",
+                    username, password_hash, full_name, city, phone_number, email, date_of_birth, pic.read())
             
         # Session variables
         session["user_id"] = db.execute("SELECT * FROM users WHERE username = ?", username)[0]["id"]
-        session["name"] = first_name + " " + last_name
+        session["name"] = full_name
+        session["user_type"] = "Doctor"
         
         # Redirect to home page
         return redirect("/")
@@ -136,9 +139,8 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         
-        data = db.execute("SELECT * FROM users WHERE username = ? AND is_doctor = TRUE", username)
-        
         # Validate username
+        data = db.execute("SELECT * FROM users WHERE username = ?", username)
         if len(data) != 1:
             return render_template("Login.html", error="Couldn't find user. Please try again.")
         
@@ -148,7 +150,8 @@ def login():
         
         # Store the user id in the session's data
         session["user_id"] = data[0]["id"]
-        session["name"] = data[0]["first_name"] + " " + data[0]["last_name"]
+        session["name"] = data[0]["full_name"]
+        session["user_type"] = "Doctor"
         
         # Store the profile picture
         with open("static/media/profile_picture.png", "wb") as pic:
@@ -268,8 +271,7 @@ def edit_info():
     else:
         # Data input from the form
         username = request.form.get("username")
-        first_name = request.form.get("first_name")
-        last_name = request.form.get("last_name")
+        full_name = request.form.get("full_name")
         phone_number = request.form.get("phone_number")
         city = request.form.get("city")
         date_of_birth = request.form.get("date_of_birth")
@@ -299,10 +301,8 @@ def edit_info():
             db.execute("UPDATE users SET date_of_birth=? WHERE id=?", date_of_birth, session["user_id"])
         
         # Update data if edited
-        if first_name:
-            db.execute("UPDATE users SET first_name=? WHERE id=?", first_name, session["user_id"])
-        if last_name:
-            db.execute("UPDATE users SET last_name=? WHERE id=?", last_name, session["user_id"])
+        if full_name:
+            db.execute("UPDATE users SET full_name=? WHERE id=?", full_name, session["user_id"])
         if city:
             db.execute("UPDATE users SET city=? WHERE id=?", city, session["user_id"])
         
@@ -312,6 +312,8 @@ def edit_info():
             profile_picture.save("static/media/profile_picture.png")
             with open ("static/media/profile_picture.png", "rb") as pic:
                 db.execute("UPDATE users SET profile_picture=? WHERE id=?", pic.read(), session["user_id"])
+                
+        session["full_name"] = full_name
             
         # Redirect to home page
         return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")

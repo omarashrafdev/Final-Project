@@ -8,6 +8,12 @@
     <form method="POST" action="/Register" class="login-form" enctype="multipart/form-data">
         <small>{{ error }}</small>
         <h1>Sign up</h1>
+        <div style="margin: 5px 0px 10px 0px;">
+            <input class="radio-field" name="user_type" id="doctor" type="radio" required>
+            <label for="doctor" style="margin-right: 40px;">Doctor</label>
+            <input class="radio-field" name="user_type" id="username" type="radio" required>
+            <label for="doctor">Patient</label>
+        </div>
         <div>
             <input class="text-field" name="username" id="username" type="text" placeholder="Username" required>
         </div>
@@ -87,7 +93,7 @@
         flex-direction: column;
         text-align: center;
         justify-content: center;
-        height: 100vh;
+        min-height: 100vh;
     }
 
     .login-form h1 {
