@@ -124,7 +124,6 @@ def Register():
         return redirect("/")
         
         
-
 @app.route("/Login", methods=["GET", "POST"])
 def login():
     # Clear the current session
@@ -263,9 +262,59 @@ def verify_new_email(email):
 
 @app.route("/EditInfo", methods=["GET", "POST"])
 def edit_info():
+    data = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
     if request.method == "GET":
-        data = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
         return render_template("edit_info.html", data=data, CITIES=CITIES)
     else:
-        ...
+        # Data input from the form
+        username = request.form.get("username")
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        phone_number = request.form.get("phone_number")
+        city = request.form.get("city")
+        date_of_birth = request.form.get("date_of_birth")
+        profile_picture = request.files['profile_picture[]']
+        
+        # Validate username duplication and update db if valid
+        if username:
+            data_test = db.execute("SELECT * FROM users WHERE username = ? AND is_doctor = TRUE", username)
+            if len(data_test) != 0:
+                return render_template("edit_info.html", error1="Username already in use. Please try another one.", 
+                                    data=data, CITIES=CITIES)
+            db.execute("UPDATE users SET username=? WHERE id=?", username, session["user_id"])
+        
+        # Validate phone number duplication and update db if valid
+        if phone_number:
+            data_test = db.execute("SELECT * FROM users WHERE phone_number = ? AND is_doctor = TRUE", phone_number)
+            if len(data_test) != 0:
+                return render_template("edit_info.html", error2="Phone number is already in use. Please try another one.", 
+                                    data=data, CITIES=CITIES)
+            db.execute("UPDATE users SET phone_number=? WHERE id=?", phone_number, session["user_id"])
+            
+        # Validate user's age (older than 15) and update db if valid
+        if date_of_birth:
+            if Years_Between(date_of_birth, TODAY) < 15:
+                return render_template("edit_info.html", error3="You have to be older than 15 years old to use", 
+                                        data=data, CITIES=CITIES)
+            db.execute("UPDATE users SET date_of_birth=? WHERE id=?", date_of_birth, session["user_id"])
+        
+        # Update data if edited
+        if first_name:
+            db.execute("UPDATE users SET first_name=? WHERE id=?", first_name, session["user_id"])
+        if last_name:
+            db.execute("UPDATE users SET last_name=? WHERE id=?", last_name, session["user_id"])
+        if city:
+            db.execute("UPDATE users SET city=? WHERE id=?", city, session["user_id"])
+        
+        # Store profile pic in static media
+        profile_picture = request.files['profile_picture[]']
+        if str(profile_picture) != "<FileStorage: '' ('application/octet-stream')>":
+            profile_picture.save("static/media/profile_picture.png")
+            with open ("static/media/profile_picture.png", "rb") as pic:
+                db.execute("UPDATE users SET profile_picture=? WHERE id=?", pic.read(), session["user_id"])
+            
+        # Redirect to home page
+        return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
+
+
     
