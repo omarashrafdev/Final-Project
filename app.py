@@ -319,4 +319,5 @@ def edit_info():
         return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
 
 
-    
+def useless():
+    ...

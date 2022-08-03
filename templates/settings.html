@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block sidebar %}
+    <a href="/" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">speed</span>
+        <p>Dashboard</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">calendar_month</span>
+        <p>Calendar</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">group</span>
+        <p>Patient list</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">chat</span>
+        <p>Messages</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">payments</span>
+        <p>Payment information</p>
+    </a>
+    <a href="/Settings" class="sidebar_active sidebar_hover sidebar_element">
+        <span class="material-icons md-48">settings</span>
+        <p>Settings</p>
+    </a>
+{% endblock %}
+
+{% block main %}
+    <section class="elements-container">
+        <a href="/ChangePassword" class="element">
+            <span class="material-icons md-48">password</span>
+            <p>Change password</p>
+        </a>
+        <a href="/ChangeEmail" class="element">
+            <span class="material-icons md-48">email</span>
+            <p>Change email address</p>
+        </a>
+        <a href="/EditInfo" class="element">
+            <span class="material-icons md-48">edit</span>
+            <p>Modify information</p>
+        </a>
+    </section>
+{% endblock %}
+
+{% block style %}
+    .elements-container {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+    .element {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        
+        font-size: 24px;
+        background-color: #ffffff;
+        border: 2px solid #0d53fc;
+        border-radius: 10px;
+
+        width: 300px;
+        padding: 30px;
+        margin: 10px;
+    }
+    .element:hover {
+        background-color: #0d53fc;
+        transition: 0.4s;
+    }
+    .element:hover span, .element:hover p{
+        color: #ffffff;
+        transition: 0.4s;
+    }
+    .element span {
+        margin-right: 10px;
+    }
+{% endblock %}
