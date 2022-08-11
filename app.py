@@ -113,15 +113,16 @@ def Register():
             with open ("static/media/profile_picture.png", "rb") as pic:
                 db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified) VALUES (?,?,?,?,?,?,TRUE,?,?,FALSE)",
                     username, password_hash, full_name, city, phone_number, email, date_of_birth, pic.read())
+                session["user_type"] = "Doctor"
         else: # For patients
             with open ("static/media/profile_picture.png", "rb") as pic:
                 db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified) VALUES (?,?,?,?,?,?,FALSE,?,?,FALSE)",
                     username, password_hash, full_name, city, phone_number, email, date_of_birth, pic.read())
+                session["user_type"] = "Patient"
             
         # Session variables
         session["user_id"] = db.execute("SELECT * FROM users WHERE username = ?", username)[0]["id"]
         session["name"] = full_name
-        session["user_type"] = "Doctor"
         
         # Redirect to home page
         return redirect("/")
@@ -151,7 +152,10 @@ def login():
         # Store the user id in the session's data
         session["user_id"] = data[0]["id"]
         session["name"] = data[0]["full_name"]
-        session["user_type"] = "Doctor"
+        if data[0]["is_doctor"]:
+            session["user_type"] = "Doctor"
+        else:
+            session["user_type"] = "Patient"
         
         # Store the profile picture
         with open("static/media/profile_picture.png", "wb") as pic:
@@ -319,5 +323,7 @@ def edit_info():
         return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
 
 
-def useless():
-    ...
+@app.route("/Patients")
+def patients():
+    patients = db.execute("SELECT * FROM users WHERE id=(SELECT patient_id FROM appointments WHERE doctor_id=?)", session["user_id"])
+    return render_template("patients.html", patients=patients, Years_Between=Years_Between, TODAY=TODAY)

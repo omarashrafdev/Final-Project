@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block sidebar %}
+    <a href="/" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">speed</span>
+        <p>Dashboard</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">calendar_month</span>
+        <p>Calendar</p>
+    </a>
+    <a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
+        <span class="material-icons md-48">group</span>
+        <p>Patient list</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">chat</span>
+        <p>Messages</p>
+    </a>
+    <a href="" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">payments</span>
+        <p>Payment information</p>
+    </a>
+    <a href="/Settings" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">settings</span>
+        <p>Settings</p>
+    </a>
+{% endblock %}
+
+{% block main %}
+    <div id="main">
+        <h1>Patients</h1>
+        <table>
+            <thead>
+                <td>Name</td>
+                <td>City</td>
+                <td>Phone Number</td>
+                <td>Age</td>
+            </thead>
+            {% for patient in patients %}
+                <tr>
+                    <td>{{ patient.full_name }}</td>
+                    <td>{{ patient.city }}</td>
+                    <td>{{ patient.phone_number }}</td>
+                    <td>{{ Years_Between(patient.date_of_birth, TODAY) }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block style %}
+    #main {
+        padding: 10px;
+    }
+    h1 {
+        font-size: 35px;
+    }
+    tr {
+        border-bottom: 1px solid black;
+    }
+    td {
+        padding: 5px;
+        text-align: center;
+    }
+{% endblock %}
