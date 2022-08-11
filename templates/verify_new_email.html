@@ -13,18 +13,22 @@
         <span class="material-icons md-48">calendar_month</span>
         <p>Calendar</p>
     </a>
-    <a href="" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">group</span>
-        <p>Patient list</p>
-    </a>
+    {% if session["user_type"] == 'Doctor' %}
+        <a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
+            <span class="material-icons md-48">group</span>
+            <p>Patient list</p>
+        </a>
+    {% endif %}
     <a href="" class="sidebar_hover sidebar_element">
         <span class="material-icons md-48">chat</span>
         <p>Messages</p>
     </a>
-    <a href="" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">payments</span>
-        <p>Payment information</p>
-    </a>
+    {% if session["user_type"] == 'Doctor' %}
+        <a href="" class="sidebar_hover sidebar_element">
+            <span class="material-icons md-48">payments</span>
+            <p>Payment information</p>
+        </a>
+    {% endif %}
     <a href="/Settings" class="sidebar_active sidebar_hover sidebar_element">
         <span class="material-icons md-48">settings</span>
         <p>Settings</p>

@@ -1,5 +1,6 @@
 # Import needed functions
 from crypt import methods
+from email import message
 import os
 import smtplib
 
@@ -9,7 +10,7 @@ from cs50 import SQL
 from datetime import date
 from werkzeug.security import check_password_hash, generate_password_hash
 from random import randint
-from functions import login_required, strong_password_check, Years_Between
+from functions import login_required, doctors_only, strong_password_check, Years_Between, generate_random_number
 
 # Configure application
 app = Flask(__name__)
@@ -20,6 +21,7 @@ app.run(debug=True)
 
 # Declare GLOBAL varable for the email verification function
 CODE = randint(111111, 999999)
+TEMP_CODE = 0
 
 # Store the URL generated with the secret key from the environment variable to the program
 #s = URLSafeTimedSerializer(os.environ["SECRET_KEY"])
@@ -44,8 +46,10 @@ TODAY = date.today()
 def index():
     # Essential variables
     user_id = session["user_id"]
-    # if not db.execute("SELECT is_verified FROM users WHERE id=?", user_id)[0]["is_verified"]:
-        # return redirect("/")
+
+    # Verify email if not verified
+    if not db.execute("SELECT is_verified FROM users WHERE id=?", user_id)[0]["is_verified"]:
+        return redirect("/Rigster/EmailVerify")
     
     # Return homapege view
     return render_template("index.html")
@@ -126,8 +130,31 @@ def Register():
         
         # Redirect to home page
         return redirect("/")
-        
-        
+
+
+@app.route("/Rigster/EmailVerify", methods=["GET", "POST"])
+@login_required
+def EmailVerify():
+    global TEMP_CODE
+    if request.method == "GET":
+        email = db.execute("SELECT email FROM users WHERE id=?", session["user_id"])[0]["email"]
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
+        TEMP_CODE = generate_random_number()
+        server.sendmail(os.environ["EMAIL"], email, str(TEMP_CODE))
+        server.close()
+        return render_template("Email_Verification.html")
+
+    else:
+        user_code = request.form.get("code")
+        if TEMP_CODE == int(user_code):
+            db.execute("UPDATE users SET is_verified=1 WHERE id=?", session["user_id"])
+            return redirect("/")
+        else:
+            return render_template("Email_Verification.html", error="Wrong code. New one was sent.")
+
+
 @app.route("/Login", methods=["GET", "POST"])
 def login():
     # Clear the current session
@@ -166,6 +193,7 @@ def login():
     
 
 @app.route("/Logout")
+@login_required
 def logout():
     # Clear the existing session
     session.clear()
@@ -179,17 +207,20 @@ def logout():
 
 
 @app.route("/Settings")
+@login_required
 def settings():
     return render_template("settings.html")
 
 
 @app.route("/Profile-<int:id>")
+@login_required
 def profile(id):
     data = db.execute("SELECT * FROM users WHERE id=?", id)
     return render_template("profile.html", data=data)
 
 
 @app.route("/ChangePassword", methods=["GET", "POST"])
+@login_required
 def change_password():
     if request.method == "GET":
         return render_template("change_password.html")
@@ -222,6 +253,7 @@ def change_password():
         
 
 @app.route("/ChangeEmail", methods=["GET", "POST"])
+@login_required
 def change_email():
     if request.method == "GET":
         return render_template("change_email.html")
@@ -249,6 +281,7 @@ def change_email():
     
 
 @app.route("/VerifyNewEmail/<email>", methods=["GET", "POST"])
+@login_required
 def verify_new_email(email):
     if request.method == "GET":
         return render_template("verify_new_email.html", email=email)
@@ -268,6 +301,7 @@ def verify_new_email(email):
     
 
 @app.route("/EditInfo", methods=["GET", "POST"])
+@login_required
 def edit_info():
     data = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
     if request.method == "GET":
@@ -324,8 +358,23 @@ def edit_info():
 
 
 @app.route("/Patients")
+@login_required
+@doctors_only
 def patients():
     patients = db.execute("SELECT * FROM users WHERE id=(SELECT patient_id FROM appointments WHERE doctor_id=?)", session["user_id"])
     return render_template("patients.html", patients=patients, Years_Between=Years_Between, TODAY=TODAY)
 
-    # Practicing pull
+
+@app.route("/AccessDenied")
+@login_required
+def access_denied():
+    return render_template("no_access.html")
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+   return render_template('404.html', title = '404'), 404
+
+
+# 500 server down
+# something went wrong
