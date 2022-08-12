@@ -371,10 +371,17 @@ def access_denied():
     return render_template("no_access.html")
 
 
+# Error Handlers
 @app.errorhandler(404)
 def page_not_found(error):
    return render_template('404.html', title = '404'), 404
 
 
-# 500 server down
-# something went wrong
+@app.errorhandler(400)
+@app.errorhandler(401)
+@app.errorhandler(403)
+@app.errorhandler(405)
+@app.errorhandler(500)
+@app.errorhandler(502)
+def something_went_wrong(error):
+   return render_template('went_wrong.html')
