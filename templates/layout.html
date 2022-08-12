@@ -8,15 +8,24 @@
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <style>{% block style %}{% endblock %}</style>
+    <style>
+    {% block style %}
+    {% endblock %}
+    {% if session["user_type"] == 'Patient' %}
+        @media (max-width: 800px){
+            .sidebar_element {
+                width: 25%;
+            }
+        }
+    {% endif %}
+    </style>
 
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-    {% if session["user_id"] %}
     <header class="sidebar">
         <div class="title">
-            <a href="" class="logo_name">
+            <a href="/" class="logo_name">
                 <div class="logo">
                     <img src="/static/media/logo.png" alt="logo">
                 </div>
@@ -50,12 +59,6 @@
             </div>
         </div>
     </header>
-    {% else %}
-    <!--
-        Login section
-    -->
-    {% endif %}
-    
 
     <section class="page">
         {% block main %}{% endblock %}
