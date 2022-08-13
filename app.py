@@ -1,6 +1,4 @@
 # Import needed functions
-from crypt import methods
-from email import message
 import os
 import smtplib
 
@@ -20,7 +18,6 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.run(debug=True)
 
 # Declare GLOBAL varable for the email verification function
-CODE = randint(111111, 999999)
 TEMP_CODE = 0
 
 # Store the URL generated with the secret key from the environment variable to the program
@@ -53,6 +50,12 @@ def index():
     
     # Return homapege view
     return render_template("index.html")
+
+
+@app.route("/AddAppointment")
+@login_required
+def add_appointment():
+    return render_template("add_appointment.html")
 
 
 @app.route("/Register", methods=["GET", "POST"])
@@ -206,17 +209,27 @@ def logout():
     return redirect("/")
 
 
+@app.route("/Calendar")
+@login_required
+def calendar():
+    if session["user_type"] == "Doctor":
+        return render_template("calendar.html")
+    else:
+        return render_template("calendar.html")
+
+
+@app.route("/Patients")
+@login_required
+@doctors_only
+def patients():
+    patients = db.execute("SELECT * FROM users WHERE id=(SELECT patient_id FROM appointments WHERE doctor_id=?)", session["user_id"])
+    return render_template("patients.html", patients=patients, Years_Between=Years_Between, TODAY=TODAY)
+
+
 @app.route("/Settings")
 @login_required
 def settings():
     return render_template("settings.html")
-
-
-@app.route("/Profile-<int:id>")
-@login_required
-def profile(id):
-    data = db.execute("SELECT * FROM users WHERE id=?", id)
-    return render_template("profile.html", data=data)
 
 
 @app.route("/ChangePassword", methods=["GET", "POST"])
@@ -267,7 +280,8 @@ def change_email():
             return render_template("change_email.html", error="Email already in use. Please try again.")
 
         # The message
-        message = "\nThis is your code: " + str(CODE)
+        TEMP_CODE = generate_random_number()
+        message = "\nThis is your code: " + str(TEMP_CODE)
         
         # Send message to the new email
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
@@ -290,7 +304,7 @@ def verify_new_email(email):
         code = int(request.form.get("code"))
 
         # Validate code
-        if code != CODE:
+        if code != TEMP_CODE:
             return render_template("verify_new_email.html", error="Wrong code. New one was sent.", email=email)
         
         # Update the email in the database
@@ -357,12 +371,11 @@ def edit_info():
         return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
 
 
-@app.route("/Patients")
+@app.route("/Profile-<int:id>")
 @login_required
-@doctors_only
-def patients():
-    patients = db.execute("SELECT * FROM users WHERE id=(SELECT patient_id FROM appointments WHERE doctor_id=?)", session["user_id"])
-    return render_template("patients.html", patients=patients, Years_Between=Years_Between, TODAY=TODAY)
+def profile(id):
+    data = db.execute("SELECT * FROM users WHERE id=?", id)
+    return render_template("profile.html", data=data)
 
 
 @app.route("/AccessDenied")

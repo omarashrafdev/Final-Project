@@ -15,7 +15,7 @@ def login_required(f):
 def doctors_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get("user_type") is not "Doctor":
+        if session.get("user_type") != "Doctor":
             return redirect("/AccessDenied")
         return f(*args, **kwargs)
     return decorated_function

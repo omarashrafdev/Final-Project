@@ -23,6 +23,7 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+    {% if session["user_id"] %}
     <header class="sidebar">
         <div class="title">
             <a href="/" class="logo_name">
@@ -59,6 +60,7 @@
             </div>
         </div>
     </header>
+    {% endif %}
 
     <section class="page">
         {% block main %}{% endblock %}

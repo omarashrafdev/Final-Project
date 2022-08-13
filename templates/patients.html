@@ -9,14 +9,14 @@
         <span class="material-icons md-48">speed</span>
         <p>Dashboard</p>
     </a>
-    <a href="" class="sidebar_hover sidebar_element">
+    <a href="/Calendar" class="sidebar_hover sidebar_element">
         <span class="material-icons md-48">calendar_month</span>
         <p>Calendar</p>
     </a>
     {% if session["user_type"] == 'Doctor' %}
         <a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
             <span class="material-icons md-48">group</span>
-            <p>Patient list</p>
+            <p>Patient List</p>
         </a>
     {% endif %}
     <a href="" class="sidebar_hover sidebar_element">
@@ -36,40 +36,142 @@
 {% endblock %}
 
 {% block main %}
-    <div id="main">
-        <h1>Patients</h1>
-        <table>
-            <thead>
-                <td>Name</td>
-                <td>City</td>
-                <td>Phone Number</td>
-                <td>Age</td>
-            </thead>
-            {% for patient in patients %}
-                <tr>
-                    <td>{{ patient.full_name }}</td>
-                    <td>{{ patient.city }}</td>
-                    <td>{{ patient.phone_number }}</td>
-                    <td>{{ Years_Between(patient.date_of_birth, TODAY) }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+    <div id="title">
+        <div><span class="material-icons md-48">group</span></div>
+        <h1>Patient List</h1>
     </div>
+    <hr>
+    <div id="options">
+        <div id="patient_number">
+            <h1>1</h1>
+            <p>patients</p>
+        </div>
+        <div id="sort_by">
+            <p>Sort by:</p>
+            <select>
+                <option>Name</option>
+                <option selected>Next Appointment</option>
+                <option>Last Appointment</option>
+                <option>Register Date</option>
+            </select>
+        </div>
+    </div>
+    <hr>
+    <table>
+        <thead>
+            <td><input type="checkbox" id="select_all"></td>
+            <td>Basic Info</td>
+            <td>Phone Number</td>
+            <td>City</td>
+            <td>Next Appointment</td>
+            <td>Last Appointment</td>
+            <td>Register Date</td>
+        </thead>
+        <tr id="table_row">
+            <td id="select"><input type="checkbox" id="select1"></td>
+            <td id="basic_info">
+                <div id="image_container"><img src="/static/media/profile_picture.png" alt="patient image"></div>
+                <div>
+                    <p><b>Name Name</b></p>
+                    <p>email@email.com</p>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
 {% endblock %}
 
 
 {% block style %}
-    #main {
-        padding: 10px;
+    #title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 25px;
     }
-    h1 {
+    #title h1, #title div span {
         font-size: 35px;
     }
-    tr {
-        border-bottom: 1px solid black;
+    #title div span {
+        color: #0d53fc;
+        margin-right: 10px;
     }
-    td {
-        padding: 5px;
-        text-align: center;
+
+    #options {
+        padding: 10px 25px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    #patient_number, #sort_by {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    #patient_number {
+        padding-right: 20px;
+        border-right: 1px solid #c6cdd8;
+    }
+    #patient_number h1 {
+        color: #0d53fc;
+        font-size: 35px;
+        margin-right: 10px;
+    }
+    #patient_number p {
+        color: #88949e;
+        font-weight: 600;
+    }
+    #sort_by {
+        padding-left: 20px;
+    }
+    #sort_by p {
+        color: #88949e;
+        margin-right: 10px;
+        font-weight: 600;
+    }
+    #sort_by select {
+        color: #88949e;
+        font-weight: 600;
+        width: 200px;
+        height: 30px;
+
+        padding: 0px 10px;
+
+        border: 1px solid #88949e;
+        border-radius: 4px;
+    }
+
+    table {
+        margin: 10px 25px 10px 30px;
+        border-collapse: collapse;
+    }
+    thead {
+        height: 40px;
+    }
+    thead td {
+        color: #88949e;
+    }
+    #table_row {
+        background-color: #ffffff;
+    }
+    #select {
+        width: 50px;
+    }
+    #basic_info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        width: 250px;
+    }
+    #image_container {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+    #image_container img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
     }
 {% endblock %}

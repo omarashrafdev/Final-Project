@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Settings
+    Home
 {% endblock %}
 
 {% block sidebar %}
@@ -36,26 +36,41 @@
 {% endblock %}
 
 {% block main %}
-        <h1>You don't have access to this page.</h1>
-        <p>Return to <a href="/" class="link">home page</a></p>
+    <div id="container">
+        <h1>Add Appointment</h1>
+        <div id="filters">
+            <input class="text-field" autocomplete="off" id="username" name="username" type="text" placeholder="Filter by username">
+            <input class="text-field" autocomplete="off" id="email" name="email" type="text" placeholder="Filter by email">
+        </div>
+        <form >
+            {% for patient in patients %}
+                <div>
+
+                </div>
+            {% endfor %}
+        </form>
+    </div>
 {% endblock %}
 
 {% block style %}
-    .page {
+    #container {
+        padding: 10px;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
-    .page h1 {
-        font-size: 35px;
-        margin: 5px;
-    }
-    .link {
-        transition: 0.4s;
-        color: rgb(104, 85, 224);
-    }
-    .link:hover {
-        color: #0d53fc;
+    .text-field {
+        width: 200px;
+        height: 20px;
+
+        padding: 10px;
+        margin-bottom: 10px;
+
+        border: 1px solid #0d53fc;
+        border-radius: 4px;
     }
 {% endblock %}
+
+<script>
+    
+</script>

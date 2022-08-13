@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Settings
+    Home
 {% endblock %}
 
 {% block sidebar %}
@@ -9,7 +9,7 @@
         <span class="material-icons md-48">speed</span>
         <p>Dashboard</p>
     </a>
-    <a href="/Calendar" class="sidebar_hover sidebar_element">
+    <a href="/Calendar" class="sidebar_active sidebar_hover sidebar_element">
         <span class="material-icons md-48">calendar_month</span>
         <p>Calendar</p>
     </a>
@@ -36,26 +36,8 @@
 {% endblock %}
 
 {% block main %}
-        <h1>You don't have access to this page.</h1>
-        <p>Return to <a href="/" class="link">home page</a></p>
+    <h1>Under maintainance</h1>
 {% endblock %}
 
 {% block style %}
-    .page {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    .page h1 {
-        font-size: 35px;
-        margin: 5px;
-    }
-    .link {
-        transition: 0.4s;
-        color: rgb(104, 85, 224);
-    }
-    .link:hover {
-        color: #0d53fc;
-    }
 {% endblock %}
