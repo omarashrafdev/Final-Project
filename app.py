@@ -223,7 +223,7 @@ def calendar():
 @doctors_only
 def patients():
     patients = db.execute("SELECT * FROM users WHERE id=(SELECT patient_id FROM appointments WHERE doctor_id=?)", session["user_id"])
-    return render_template("patients.html", patients=patients, Years_Between=Years_Between, TODAY=TODAY)
+    return render_template("patients.html", patients=patients, Years_Between=Years_Between, TODAY=TODAY, list=[1,2,3])
 
 
 @app.route("/Settings")

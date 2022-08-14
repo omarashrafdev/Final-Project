@@ -43,7 +43,7 @@
     <hr>
     <div id="options">
         <div id="patient_number">
-            <h1>1</h1>
+            <h1>{{list|length}}</h1>
             <p>patients</p>
         </div>
         <div id="sort_by">
@@ -59,26 +59,42 @@
     <hr>
     <table>
         <thead>
-            <td><input type="checkbox" id="select_all"></td>
-            <td>Basic Info</td>
-            <td>Phone Number</td>
-            <td>City</td>
-            <td>Next Appointment</td>
-            <td>Last Appointment</td>
-            <td>Register Date</td>
+            <td class="cell"><input type="checkbox" id="select_all" onclick="SelectAll(this)"></td>
+            <td class="cell">Basic Info</td>
+            <td class="cell">Phone Number</td>
+            <td class="cell">City</td>
+            <td class="cell">Next Appointment</td>
+            <td class="cell">Last Appointment</td>
+            <td class="cell">Register Date</td>
+            <td class="cell"></td>
         </thead>
-        <tr id="table_row">
-            <td id="select"><input type="checkbox" id="select1"></td>
-            <td id="basic_info">
-                <div id="image_container"><img src="/static/media/profile_picture.png" alt="patient image"></div>
-                <div>
-                    <p><b>Name Name</b></p>
-                    <p>email@email.com</p>
-                </div>
-            </td>
-            <td></td>
-        </tr>
+        {% for i in list %}
+            <tr class="table_row">
+                <td class="select cell"><input type="checkbox" name="select" id="select"></td>
+                <td class="basic_info cell">
+                    <div id="image_container"><img src="/static/media/profile_picture.png" alt="patient image"></div>
+                    <div>
+                        <p><b>Name Name</b></p>
+                        <p>email@email.com</p>
+                    </div>
+                </td>
+                <td class="cell">+201062394822</td>
+                <td class="cell">Menoufia</td>
+                <td class="cell">27/8/2022 - 1:00 AM</td>
+                <td class="cell">27/7/2022 - 1:00 AM</td>
+                <td class="cell">27/7/2021</td>
+                <td class="cell"><a href=""><span class="material-icons md-48">more_horiz</span></a></td>
+            </tr>
+        {% endfor %}
     </table>
+    <script>
+        function SelectAll(source) {
+            checkboxes = document.getElementsByName('select');
+            for(var i=0, n=checkboxes.length;i<n;i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>
 {% endblock %}
 
 
@@ -142,8 +158,10 @@
     }
 
     table {
+        width: 90%;
         margin: 10px 25px 10px 30px;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0px 7px;
     }
     thead {
         height: 40px;
@@ -151,18 +169,22 @@
     thead td {
         color: #88949e;
     }
-    #table_row {
+    td:first-child, th:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+    td:last-child, th:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+    .table_row {
         background-color: #ffffff;
     }
-    #select {
-        width: 50px;
+    .cell {
+        padding: 5px 15px;
     }
-    #basic_info {
+    .basic_info {
         display: flex;
         flex-direction: row;
         align-items: center;
-
-        width: 250px;
     }
     #image_container {
         width: 40px;
