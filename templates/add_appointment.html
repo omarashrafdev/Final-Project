@@ -38,16 +38,21 @@
 {% block main %}
     <div id="container">
         <h1>Add Appointment</h1>
-        <div id="filters">
-            <input class="text-field" autocomplete="off" id="username" name="username" type="text" placeholder="Filter by username">
-            <input class="text-field" autocomplete="off" id="email" name="email" type="text" placeholder="Filter by email">
-        </div>
-        <form >
-            {% for patient in patients %}
-                <div>
-
-                </div>
-            {% endfor %}
+        <br>
+        {% if success %}
+            <p>{{success}}</p>
+        {% endif %}
+        <form method="POST" action="/AddAppointments">
+            <div>
+                <input class="text-field" autocomplete="off" id="date" name="date" type="date">
+            </div>
+            <div>
+                <input class="text-field" autocomplete="off" id="time" name="time" type="time">
+            </div>
+            <div>
+                <input class="text-field" autocomplete="off" id="patient_id" name="patient_id" type="number" placeholder="Patient id">
+            </div>
+            <input class="text-field" type="submit">
         </form>
     </div>
 {% endblock %}

@@ -43,21 +43,40 @@
     <hr>
     <div id="options">
         <div id="patient_number">
-            <h1>{{list|length}}</h1>
+            <h1>{{patients|length}}</h1>
             <p>patients</p>
         </div>
         <div id="sort_by">
             <p>Sort by:</p>
-            <select>
-                <option>Name</option>
-                <option selected>Next Appointment</option>
-                <option>Last Appointment</option>
-                <option>Register Date</option>
-            </select>
+            <form action="/Patients" method="POST">
+                <select id="sort_table" onchange="this.form.submit()" name="sort_by">
+                    {% if selected == 'name' %}
+                        <option value="name" selected>Name</option>
+                        <option value="next_appointment">Next Appointment</option>
+                        <option value="last_appointment">Last Appointment</option>
+                        <option value="register_date">Register Date</option>
+                    {% elif selected == 'next_appointment' %}
+                        <option value="name">Name</option>
+                        <option value="next_appointment" selected>Next Appointment</option>
+                        <option value="last_appointment">Last Appointment</option>
+                        <option value="register_date">Register Date</option>
+                    {% elif selected == 'last_appointment' %}
+                        <option value="name">Name</option>
+                        <option value="next_appointment">Next Appointment</option>
+                        <option value="last_appointment" selected>Last Appointment</option>
+                        <option value="register_date">Register Date</option>
+                    {% elif selected == 'register_date' %}
+                        <option value="name">Name</option>
+                        <option value="next_appointment">Next Appointment</option>
+                        <option value="last_appointment">Last Appointment</option>
+                        <option value="register_date" selected>Register Date</option>
+                    {% endif %}
+                </select>
+            </form>
         </div>
     </div>
     <hr>
-    <table>
+    <table id="patient_list">
         <thead>
             <td class="cell"><input type="checkbox" id="select_all" onclick="SelectAll(this)"></td>
             <td class="cell">Basic Info</td>
@@ -68,20 +87,20 @@
             <td class="cell">Register Date</td>
             <td class="cell"></td>
         </thead>
-        {% for i in list %}
+        {% for patient in patients %}
             <tr class="table_row">
                 <td class="select cell"><input type="checkbox" name="select" id="select"></td>
                 <td class="basic_info cell">
-                    <div id="image_container"><img src="/static/media/profile_picture.png" alt="patient image"></div>
+                    <div id="image_container"><img src="/static/media/patients/{{ patient.id }}.png" alt="patient image"></div>
                     <div>
-                        <p><b>Name Name</b></p>
-                        <p>email@email.com</p>
+                        <p><b>{{patient.full_name}}</b></p>
+                        <p>{{patient.email}}</p>
                     </div>
                 </td>
-                <td class="cell">+201062394822</td>
-                <td class="cell">Menoufia</td>
-                <td class="cell">27/8/2022 - 1:00 AM</td>
-                <td class="cell">27/7/2022 - 1:00 AM</td>
+                <td class="cell">{{patient.phone_number}}</td>
+                <td class="cell">{{patient.city}}</td>
+                <td class="cell">{{patient.next_appointment}}</td>
+                <td class="cell">{{patient.last_appointment}}</td>
                 <td class="cell">27/7/2021</td>
                 <td class="cell"><a href=""><span class="material-icons md-48">more_horiz</span></a></td>
             </tr>

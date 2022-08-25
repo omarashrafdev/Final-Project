@@ -45,7 +45,7 @@ a, img {
     display: flex;
     flex-direction: column;
 
-    width: 350px;
+    width: 300px;
     height: 100%;
 
     background-color: var(--White);
@@ -234,7 +234,7 @@ a, img {
 
 
 .page {
-    padding-left: 350px;
+    padding-left: 300px;
     min-height: 100vh;
     background-color: var(--OffWhite);
 }
