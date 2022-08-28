@@ -1,81 +1,74 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Home
+Home
 {% endblock %}
 
 {% block sidebar %}
-    <a href="/" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">speed</span>
-        <p>Dashboard</p>
-    </a>
-    <a href="/Calendar" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">calendar_month</span>
-        <p>Calendar</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="/Patients" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">group</span>
-            <p>Patient list</p>
-        </a>
-    {% endif %}
-    <a href="" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">chat</span>
-        <p>Messages</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">payments</span>
-            <p>Payment information</p>
-        </a>
-    {% endif %}
-    <a href="/Settings" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">settings</span>
-        <p>Settings</p>
-    </a>
+<a href="/" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">speed</span>
+    <p>Dashboard</p>
+</a>
+{% if session["user_type"] == 'Doctor' %}
+<a href="/Patients" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">group</span>
+    <p>Patient list</p>
+</a>
+{% endif %}
+{% if session["user_type"] == 'Patient' %}
+<a href="/Appointments" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">calendar_month</span>
+    <p>My Appointments</p>
+</a>
+{% endif %}
+<a href="/Settings" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">settings</span>
+    <p>Settings</p>
+</a>
 {% endblock %}
 
 {% block main %}
-    <div id="container">
-        <h1>Add Appointment</h1>
-        <br>
-        {% if success %}
-            <p>{{success}}</p>
-        {% endif %}
-        <form method="POST" action="/AddAppointments">
-            <div>
-                <input class="text-field" autocomplete="off" id="date" name="date" type="date">
-            </div>
-            <div>
-                <input class="text-field" autocomplete="off" id="time" name="time" type="time">
-            </div>
-            <div>
-                <input class="text-field" autocomplete="off" id="patient_id" name="patient_id" type="number" placeholder="Patient id">
-            </div>
-            <input class="text-field" type="submit">
-        </form>
-    </div>
+<div id="container">
+    <h1>Add Appointment</h1>
+    <br>
+    {% if success %}
+    <p>{{success}}</p>
+    {% endif %}
+    <form method="POST" action="/AddAppointments">
+        <div>
+            <input class="text-field" autocomplete="off" id="date" name="date" type="date">
+        </div>
+        <div>
+            <input class="text-field" autocomplete="off" id="time" name="time" type="time">
+        </div>
+        <div>
+            <input class="text-field" autocomplete="off" id="patient_id" name="patient_id" type="number"
+                placeholder="Patient id">
+        </div>
+        <input class="text-field" type="submit">
+    </form>
+</div>
 {% endblock %}
 
 {% block style %}
-    #container {
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .text-field {
-        width: 200px;
-        height: 20px;
+#container {
+padding: 10px;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+.text-field {
+width: 200px;
+height: 20px;
 
-        padding: 10px;
-        margin-bottom: 10px;
+padding: 10px;
+margin-bottom: 10px;
 
-        border: 1px solid #0d53fc;
-        border-radius: 4px;
-    }
+border: 1px solid #0d53fc;
+border-radius: 4px;
+}
 {% endblock %}
 
 <script>
-    
+
 </script>

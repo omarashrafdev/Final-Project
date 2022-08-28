@@ -220,15 +220,6 @@ def logout():
     return redirect("/")
 
 
-@app.route("/Calendar")
-@login_required
-def calendar():
-    if session["user_type"] == "Doctor":
-        return render_template("calendar.html")
-    else:
-        return render_template("calendar.html")
-
-
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
 @doctors_only
@@ -343,8 +334,13 @@ def patients():
 
             return render_template("patients.html", patients=sorted_patients, selected="last_appointment")
 
-        else:
-            return render_template("patients.html", patients=patients, selected="register_date")
+
+@app.route("/Patients/Delete-<int:id>")
+@login_required
+@doctors_only
+def delete_patient(id):
+    db.execute("DELETE FROM appointments WHERE doctor_id=? AND patient_id=?",session["user_id"], id)
+    return redirect("/Patients")
 
 
 @app.route("/Settings")

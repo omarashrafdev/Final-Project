@@ -1,61 +1,56 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Settings
+Settings
 {% endblock %}
 
 {% block sidebar %}
-    <a href="/" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">speed</span>
-        <p>Dashboard</p>
-    </a>
-    <a href="/Calendar" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">calendar_month</span>
-        <p>Calendar</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
-            <span class="material-icons md-48">group</span>
-            <p>Patient list</p>
-        </a>
-    {% endif %}
-    <a href="" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">chat</span>
-        <p>Messages</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">payments</span>
-            <p>Payment information</p>
-        </a>
-    {% endif %}
-    <a href="/Settings" class="sidebar_active sidebar_hover sidebar_element">
-        <span class="material-icons md-48">settings</span>
-        <p>Settings</p>
-    </a>
+<a href="/" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">speed</span>
+    <p>Dashboard</p>
+</a>
+{% if session["user_type"] == 'Doctor' %}
+<a href="/Patients" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">group</span>
+    <p>Patient list</p>
+</a>
+{% endif %}
+{% if session["user_type"] == 'Patient' %}
+<a href="/Appointments" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">calendar_month</span>
+    <p>My Appointments</p>
+</a>
+{% endif %}
+<a href="/Settings" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">settings</span>
+    <p>Settings</p>
+</a>
 {% endblock %}
 
 {% block main %}
-        <h1>Page not found</h1>
-        <p>Return to <a href="/" class="link">home page</a></p>
+<h1>Page not found</h1>
+<p>Return to <a href="/" class="link">home page</a></p>
 {% endblock %}
 
 {% block style %}
-    .page {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    .page h1 {
-        font-size: 35px;
-        margin: 5px;
-    }
-    .link {
-        transition: 0.4s;
-        color: rgb(104, 85, 224);
-    }
-    .link:hover {
-        color: #0d53fc;
-    }
+.page {
+    {% if not session["user_id"] %}
+    padding-left: 0px;
+    {% endif %}
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.page h1 {
+font-size: 35px;
+margin: 5px;
+}
+.link {
+transition: 0.4s;
+color: rgb(104, 85, 224);
+}
+.link:hover {
+color: #0d53fc;
+}
 {% endblock %}

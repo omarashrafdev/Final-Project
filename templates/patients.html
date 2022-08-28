@@ -1,218 +1,232 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Home
+Home
 {% endblock %}
 
 {% block sidebar %}
-    <a href="/" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">speed</span>
-        <p>Dashboard</p>
-    </a>
-    <a href="/Calendar" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">calendar_month</span>
-        <p>Calendar</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
-            <span class="material-icons md-48">group</span>
-            <p>Patient List</p>
-        </a>
-    {% endif %}
-    <a href="" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">chat</span>
-        <p>Messages</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">payments</span>
-            <p>Payment information</p>
-        </a>
-    {% endif %}
-    <a href="/Settings" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">settings</span>
-        <p>Settings</p>
-    </a>
+<a href="/" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">speed</span>
+    <p>Dashboard</p>
+</a>
+{% if session["user_type"] == 'Doctor' %}
+<a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
+    <span class="material-icons md-48">group</span>
+    <p>Patient list</p>
+</a>
+{% endif %}
+{% if session["user_type"] == 'Patient' %}
+<a href="/Appointments" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">calendar_month</span>
+    <p>My Appointments</p>
+</a>
+{% endif %}
+<a href="/Settings" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">settings</span>
+    <p>Settings</p>
+</a>
 {% endblock %}
 
 {% block main %}
-    <div id="title">
-        <div><span class="material-icons md-48">group</span></div>
-        <h1>Patient List</h1>
+<div id="title">
+    <div><span class="material-icons md-48">group</span></div>
+    <h1>Patient List</h1>
+</div>
+<hr>
+<div id="options">
+    <div id="patient_number">
+        <h1>{{patients|length}}</h1>
+        <p>patients</p>
     </div>
-    <hr>
-    <div id="options">
-        <div id="patient_number">
-            <h1>{{patients|length}}</h1>
-            <p>patients</p>
-        </div>
-        <div id="sort_by">
-            <p>Sort by:</p>
-            <form action="/Patients" method="POST">
-                <select id="sort_table" onchange="this.form.submit()" name="sort_by">
-                    {% if selected == 'name' %}
-                        <option value="name" selected>Name</option>
-                        <option value="next_appointment">Next Appointment</option>
-                        <option value="last_appointment">Last Appointment</option>
-                        <option value="register_date">Register Date</option>
-                    {% elif selected == 'next_appointment' %}
-                        <option value="name">Name</option>
-                        <option value="next_appointment" selected>Next Appointment</option>
-                        <option value="last_appointment">Last Appointment</option>
-                        <option value="register_date">Register Date</option>
-                    {% elif selected == 'last_appointment' %}
-                        <option value="name">Name</option>
-                        <option value="next_appointment">Next Appointment</option>
-                        <option value="last_appointment" selected>Last Appointment</option>
-                        <option value="register_date">Register Date</option>
-                    {% elif selected == 'register_date' %}
-                        <option value="name">Name</option>
-                        <option value="next_appointment">Next Appointment</option>
-                        <option value="last_appointment">Last Appointment</option>
-                        <option value="register_date" selected>Register Date</option>
-                    {% endif %}
-                </select>
-            </form>
-        </div>
+    <div id="sort_by">
+        <p>Sort by:</p>
+        <form action="/Patients" method="POST">
+            <select id="sort_table" onchange="this.form.submit()" name="sort_by">
+                {% if selected == 'name' %}
+                <option value="name" selected>Name</option>
+                <option value="next_appointment">Next Appointment</option>
+                <option value="last_appointment">Last Appointment</option>
+                {% elif selected == 'next_appointment' %}
+                <option value="name">Name</option>
+                <option value="next_appointment" selected>Next Appointment</option>
+                <option value="last_appointment">Last Appointment</option>
+                {% elif selected == 'last_appointment' %}
+                <option value="name">Name</option>
+                <option value="next_appointment">Next Appointment</option>
+                <option value="last_appointment" selected>Last Appointment</option>
+                {% endif %}
+            </select>
+        </form>
     </div>
-    <hr>
-    <table id="patient_list">
-        <thead>
+</div>
+<hr>
+<table id="patient_list">
+    <thead>
+        <!--
             <td class="cell"><input type="checkbox" id="select_all" onclick="SelectAll(this)"></td>
-            <td class="cell">Basic Info</td>
-            <td class="cell">Phone Number</td>
-            <td class="cell">City</td>
-            <td class="cell">Next Appointment</td>
-            <td class="cell">Last Appointment</td>
-            <td class="cell">Register Date</td>
-            <td class="cell"></td>
-        </thead>
-        {% for patient in patients %}
-            <tr class="table_row">
-                <td class="select cell"><input type="checkbox" name="select" id="select"></td>
-                <td class="basic_info cell">
-                    <div id="image_container"><img src="/static/media/patients/{{ patient.id }}.png" alt="patient image"></div>
-                    <div>
-                        <p><b>{{patient.full_name}}</b></p>
-                        <p>{{patient.email}}</p>
-                    </div>
-                </td>
-                <td class="cell">{{patient.phone_number}}</td>
-                <td class="cell">{{patient.city}}</td>
-                <td class="cell">{{patient.next_appointment}}</td>
-                <td class="cell">{{patient.last_appointment}}</td>
-                <td class="cell">27/7/2021</td>
-                <td class="cell"><a href=""><span class="material-icons md-48">more_horiz</span></a></td>
-            </tr>
-        {% endfor %}
-    </table>
-    <script>
-        function SelectAll(source) {
-            checkboxes = document.getElementsByName('select');
-            for(var i=0, n=checkboxes.length;i<n;i++) {
-                checkboxes[i].checked = source.checked;
-            }
+        -->
+        <td class="cell">Basic Info</td>
+        <td class="cell">Phone Number</td>
+        <td class="cell">City</td>
+        <td class="cell">Next Appointment</td>
+        <td class="cell">Last Appointment</td>
+        <td class="cell"></td>
+    </thead>
+    {% for patient in patients %}
+    <tr class="table_row">
+        <!--
+            <td class="select cell"><input type="checkbox" name="select" id="select"></td>
+        -->
+        <td class="basic_info cell">
+            <div id="image_container"><a href="/Profile-{{ patient.id }}"><img src="/static/media/patients/{{ patient.id }}.png" alt="patient image"></a></div>
+            <div>
+                <p><a href="/Profile-{{ patient.id }}"><b>{{patient.full_name}}</b></a></p>
+                <p><a href="mailto:{{patient.email}}">{{patient.email}}</a></p>
+            </div>
+        </td>
+        <td class="cell"><a href="tel:{{patient.phone_number}}">{{patient.phone_number}}</a></td>
+        <td class="cell">{{patient.city}}</td>
+        <td class="cell">{{patient.next_appointment}}</td>
+        <td class="cell">{{patient.last_appointment}}</td>
+        <td class="cell"><a href="/Patients/Delete-{{ patient.id }}"><span class="material-icons md-48">delete</span></a></td>
+    </tr>
+    {% endfor %}
+</table>
+<a class="button" href="AddAppointment">Add Appointment</a>
+
+<script>
+    /*
+    function SelectAll(source) {
+        checkboxes = document.getElementsByName('select');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            checkboxes[i].checked = source.checked;
         }
-    </script>
+    }
+    */
+</script>
 {% endblock %}
 
 
 {% block style %}
-    #title {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 10px 25px;
-    }
-    #title h1, #title div span {
-        font-size: 35px;
-    }
-    #title div span {
-        color: #0d53fc;
-        margin-right: 10px;
-    }
+#title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 25px;
+}
+#title h1, #title div span {
+    font-size: 35px;
+}
+#title div span {
+    color: #0d53fc;
+    margin-right: 10px;
+}
 
-    #options {
-        padding: 10px 25px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-    #patient_number, #sort_by {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-    #patient_number {
-        padding-right: 20px;
-        border-right: 1px solid #c6cdd8;
-    }
-    #patient_number h1 {
-        color: #0d53fc;
-        font-size: 35px;
-        margin-right: 10px;
-    }
-    #patient_number p {
-        color: #88949e;
-        font-weight: 600;
-    }
-    #sort_by {
-        padding-left: 20px;
-    }
-    #sort_by p {
-        color: #88949e;
-        margin-right: 10px;
-        font-weight: 600;
-    }
-    #sort_by select {
-        color: #88949e;
-        font-weight: 600;
-        width: 200px;
-        height: 30px;
+#options {
+    padding: 10px 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#patient_number, #sort_by {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#patient_number {
+    padding-right: 20px;
+    border-right: 1px solid #c6cdd8;
+}
+#patient_number h1 {
+    color: #0d53fc;
+    font-size: 35px;
+    margin-right: 10px;
+}
+#patient_number p {
+    color: #88949e;
+    font-weight: 600;
+}
+#sort_by {
+    padding-left: 20px;
+}
+#sort_by p {
+    color: #88949e;
+    margin-right: 10px;
+    font-weight: 600;
+}
+#sort_by select {
+    color: #88949e;
+    font-weight: 600;
+    width: 200px;
+    height: 30px;
 
-        padding: 0px 10px;
+    padding: 0px 10px;
 
-        border: 1px solid #88949e;
-        border-radius: 4px;
-    }
+    border: 1px solid #88949e;
+    border-radius: 4px;
+}
 
-    table {
-        width: 90%;
-        margin: 10px 25px 10px 30px;
-        border-collapse: separate;
-        border-spacing: 0px 7px;
-    }
-    thead {
-        height: 40px;
-    }
-    thead td {
-        color: #88949e;
-    }
-    td:first-child, th:first-child {
-        border-radius: 10px 0 0 10px;
-    }
-    td:last-child, th:last-child {
-        border-radius: 0 10px 10px 0;
-    }
-    .table_row {
-        background-color: #ffffff;
-    }
-    .cell {
-        padding: 5px 15px;
-    }
-    .basic_info {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-    #image_container {
-        width: 40px;
-        height: 40px;
-        margin-right: 10px;
-    }
-    #image_container img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-    }
+table {
+    width: 90%;
+    margin: 10px 25px 10px 30px;
+    border-collapse: separate;
+    border-spacing: 0px 7px;
+}
+thead {
+    height: 40px;
+}
+thead td {
+    color: #88949e;
+}
+td:first-child, th:first-child {
+    border-radius: 10px 0 0 10px;
+}
+td:last-child, th:last-child {
+    border-radius: 0 10px 10px 0;
+}
+.table_row {
+    background-color: #ffffff;
+}
+.cell {
+    padding: 5px 15px;
+}
+.basic_info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#image_container {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+#image_container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+.button {
+    display: block;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    border-radius: 4px;
+    font-weight: 600;
+    margin: 0 10px;
+    margin-left: 30px;
+    width: 200px;
+    padding: 10px 0;
+    box-shadow: 0 0 20px rgba(13, 83, 252, 0.2);
+    transition: 0.4s;
+
+    color: rgb(104, 85, 224);
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px solid #0d53fc;
+}
+
+.button:hover {
+    color: white;
+    box-shadow: 0 0 20px rgba(13, 83, 252, 0.6);
+    background-color: #0d53fc;
+}
 {% endblock %}

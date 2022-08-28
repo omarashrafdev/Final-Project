@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,19 +10,21 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
-    {% block style %}
-    {% endblock %}
-    {% if session["user_type"] == 'Patient' %}
-        @media (max-width: 800px){
+        {% block style %}
+        {% endblock %}
+
+        {% if session["user_type"]=='Patient' %}
+        @media (max-width: 800px) {
             .sidebar_element {
                 width: 25%;
             }
         }
-    {% endif %}
+        {% endif %}
     </style>
 
     <title>{% block title %}{% endblock %}</title>
 </head>
+
 <body>
     {% if session["user_id"] %}
     <header class="sidebar">
@@ -31,13 +34,17 @@
                     <img src="/static/media/logo.png" alt="logo">
                 </div>
                 <div class="brand_info">
-                    <div class="name"><h1>Brand Name</h1></div>
-                    <div class="description"><p>Clinic management tool</p></div>
+                    <div class="name">
+                        <h1>CLIMAN</h1>
+                    </div>
+                    <div class="description">
+                        <p>Clinic management tool</p>
+                    </div>
                 </div>
             </a>
         </div>
         {% block sidebar %}{% endblock %}
-        
+
         <div class="float-bottom">
             <a href="" class="help sidebar_element">
                 <span class="material-icons md-48">help</span>
@@ -47,7 +54,8 @@
             <div class="profile">
                 <div class="profile_link">
                     <a href="/Profile-{{ session["user_id"] }}">
-                        <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_picture.png"></div>
+                        <div class="profile_pic"><img alt="Profile Picture" src="/static/media/profile_picture.png">
+                        </div>
                         <div class="profile_info">
                             <h1>{{ session["name"] }}</h1>
                             <p>{{ session["user_type"] }}</p>
@@ -67,4 +75,5 @@
     </section>
 
 </body>
+
 </html>

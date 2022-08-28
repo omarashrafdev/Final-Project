@@ -1,46 +1,55 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Home
+Home
 {% endblock %}
 
 {% block sidebar %}
-    <a href="/" class="sidebar_active sidebar_hover sidebar_element">
-        <span class="material-icons md-48">speed</span>
-        <p>Dashboard</p>
-    </a>
-    <a href="/Calendar" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">calendar_month</span>
-        <p>Calendar</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="/Patients" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">group</span>
-            <p>Patient list</p>
-        </a>
-    {% endif %}
-    <a href="" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">chat</span>
-        <p>Messages</p>
-    </a>
-    {% if session["user_type"] == 'Doctor' %}
-        <a href="" class="sidebar_hover sidebar_element">
-            <span class="material-icons md-48">payments</span>
-            <p>Payment information</p>
-        </a>
-    {% endif %}
-    <a href="/Settings" class="sidebar_hover sidebar_element">
-        <span class="material-icons md-48">settings</span>
-        <p>Settings</p>
-    </a>
+<a href="/" class="sidebar_active sidebar_hover sidebar_element">
+    <span class="material-icons md-48">speed</span>
+    <p>Dashboard</p>
+</a>
+{% if session["user_type"] == 'Doctor' %}
+<a href="/Patients" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">group</span>
+    <p>Patient list</p>
+</a>
+{% endif %}
+{% if session["user_type"] == 'Patient' %}
+<a href="/Appointments" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">calendar_month</span>
+    <p>My Appointments</p>
+</a>
+{% endif %}
+<a href="/Settings" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">settings</span>
+    <p>Settings</p>
+</a>
 {% endblock %}
 
 {% block main %}
-    <h1>Under maintainance</h1>
-    <div>
-        <a href="/AddAppointment">Add appointment</a>
-    </div>
+<div id="title">
+    <div><span class="material-icons md-48">speed</span></div>
+    <h1>Dashboard</h1>
+</div>
+<hr>
+<div>
+    <h3>Hello, {{ session["name"] }}</h3>
+</div>
 {% endblock %}
 
 {% block style %}
+#title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 25px;
+}
+#title h1, #title div span {
+    font-size: 35px;
+}
+#title div span {
+    color: #0d53fc;
+    margin-right: 10px;
+}
 {% endblock %}
