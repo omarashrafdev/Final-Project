@@ -1,0 +1,237 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Profile
+{% endblock %}
+
+{% block sidebar %}
+<a href="/" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">speed</span>
+    <p>Dashboard</p>
+</a>
+{% if session["user_type"] == 'Doctor' %}
+<a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
+    <span class="material-icons md-48">group</span>
+    <p>Patient list</p>
+</a>
+{% endif %}
+{% if session["user_type"] == 'Patient' %}
+<a href="/Appointments" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">calendar_month</span>
+    <p>My Appointments</p>
+</a>
+{% endif %}
+<a href="/Settings" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">settings</span>
+    <p>Settings</p>
+</a>
+{% endblock %}
+
+{% block main %}
+<div id="title">
+    <div><span class="material-icons md-48">person</span></div>
+    <h1>{{ patient.full_name }}</h1>
+</div>
+<hr>
+<div id="links">
+    <p><a href="/Patients" style="color: #0d53fc;">Patient List</a></p>
+    <div><span class="material-icons md-48">arrow_forward_ios</span></div>
+    <p><a href="/Patients/Profile-{{ patient.id }}" style="color: #88949e;">{{ patient.full_name }}</a></p>
+</div>
+<hr>
+<section id="page">
+    <div id="info_section">
+        <div id="info1">
+            <div id="profile_pic"><img alt="Profile Picture" src="/static/media/patients/{{ patient.id }}.png"></div>
+            <h1 id="name">{{ patient.full_name }}</h1>
+            <a href="mailto:{{ patient.email }}"><h2 id="email">{{ patient.email }}</h2></a>
+            <div id="appointments_numbers">
+                <div id="past_number">
+                    <h1>15{{ patient.last_appointments }}</h1>
+                    <p>Past</p>
+                </div>
+                <div id="border"></div>
+                <div id="upcoming_number">
+                    <h1>3{{ patient.next_appointments }}</h1>
+                    <p>Upcoming</p>
+                </div>
+            </div>
+        </div>
+        <div id="info2">
+            <div class="info2_element gender">
+                <h1>Gender</h1>
+                <p>{{ patient.gender }}</p>
+                <hr>
+            </div>
+            <div class="info2_element date_of_birth">
+                <h1>Date of Birth</h1>
+                <p>{{ patient.date_of_birth }}</p>
+                <hr>
+            </div>
+            <div class="info2_element phone_number">
+                <h1>Phone Number</h1>
+                <p>{{ patient.phone_number }}</p>
+                <hr>
+            </div>
+            <div class="info2_element address">
+                <h1>Street Address</h1>
+                <p>{{ patient.address }}</p>
+                <hr>
+            </div>
+            <div class="info2_element city">
+                <h1>City</h1>
+                <p>{{ patient.city }}</p>
+                <hr>
+            </div>
+            <div class="info2_element zip">
+                <h1>ZIP Code</h1>
+                <p>{{ patient.zip }}</p>
+                <hr>
+            </div>
+            <div class="info2_element satus">
+                <h1>Member Satus</h1>
+                <p>{{ patient.status }}</p>
+                <hr>
+            </div>
+            <div class="info2_element register_date">
+                <h1>Register Date</h1>
+                <p>{{ patient.register_date }}</p>
+                <hr>
+            </div>
+        </div>
+        <div id="appointments">
+            <div>
+                <button>Upcoming Appointments</button>
+                <button>Past Appointments</button>
+            </div>
+            <div>
+                
+            </div>
+        </div>
+        <div id="notes">Notes</div>
+        <div id="files">Files</div>
+    </div>
+</section>
+{% endblock %}
+
+{% block style %}
+#title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 25px;
+}
+#title h1, #title div span {
+    font-size: 35px;
+}
+#title div span {
+    color: #0d53fc;
+    margin-right: 10px;
+}
+
+#links {
+    padding: 10px 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+#links p {
+    font-weight: 600;
+    padding-right: 10px;
+}
+#links div span {
+    padding-right: 10px;
+    color: #88949e;
+}
+
+#page {
+    padding: 10px 25px;
+}
+#info_section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+}
+#info1 { grid-area: 1 / 1 / 2 / 2; }
+#info2 { grid-area: 1 / 2 / 2 / 4; }
+#appointments { grid-area: 2 / 1 / 3 / 4; }
+#notes { grid-area: 1 / 4 / 2 / 5; }
+#files { grid-area: 2 / 4 / 3 / 5; }
+
+#info1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 5px;
+    text-align: center;
+}
+#info1, #info2 {
+    background-color: #ffffff;
+    padding: 25px 40px;
+    border-radius: 5px;
+}
+#profile_pic {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+}
+#profile_pic img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #0d53fc;
+    padding: 2px;
+}
+#info1 #name {
+    min-width: 175px;
+    font-size: 25px;
+    font-weight: 800;
+    padding-bottom: 5px;
+}
+#info1 #email {
+    min-width: 175px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #88949e;
+    padding-bottom: 10px;
+}
+#info1 #appointments_numbers {
+    min-width: 175px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+#past_number, #upcoming_number {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#past_number h1, #upcoming_number h1 {
+    font-size: 20px;
+    font-weight: 600;
+}
+#border {
+    border: 1px solid #88949e;
+}
+
+#info2 {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-column-gap: 40px;
+}
+.info2_element {
+    line-height: 24px;
+}
+.info2_element h1 {
+    color: #88949e;
+}
+.info2_element h1, .info2_element p {
+    font-size: 16px;
+    font-weight: 550;
+}
+.info2_element hr {
+    margin-top: 5px;
+}
+{% endblock %}

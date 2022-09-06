@@ -10,7 +10,7 @@ Home
     <p>Dashboard</p>
 </a>
 {% if session["user_type"] == 'Doctor' %}
-<a href="/Patients" class="sidebar_hover sidebar_element">
+<a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
     <span class="material-icons md-48">group</span>
     <p>Patient list</p>
 </a>
@@ -28,47 +28,103 @@ Home
 {% endblock %}
 
 {% block main %}
-<div id="container">
-    <h1>Add Appointment</h1>
-    <br>
-    {% if success %}
-    <p>{{success}}</p>
-    {% endif %}
-    <form method="POST" action="/AddAppointments">
-        <div>
-            <input class="text-field" autocomplete="off" id="date" name="date" type="date">
-        </div>
-        <div>
-            <input class="text-field" autocomplete="off" id="time" name="time" type="time">
-        </div>
-        <div>
-            <input class="text-field" autocomplete="off" id="patient_id" name="patient_id" type="number"
-                placeholder="Patient id">
-        </div>
-        <input class="text-field" type="submit">
-    </form>
+<div id="title">
+    <div><span class="material-icons md-48">group</span></div>
+    <h1>Patient List</h1>
 </div>
-{% endblock %}
-
-{% block style %}
-#container {
-padding: 10px;
-display: flex;
-flex-direction: column;
-align-items: center;
-}
-.text-field {
-width: 200px;
-height: 20px;
-
-padding: 10px;
-margin-bottom: 10px;
-
-border: 1px solid #0d53fc;
-border-radius: 4px;
-}
-{% endblock %}
+<hr>
+<form action="/AddAppointment" method="post">
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+    <div>
+        <select class="text-field" style="height: 42px; width:222px;" required name="patient">
+            <option value="" disabled selected>Select Patient</option>
+            {% for patient in patients %}
+            <option id="patient" value="{{ patient.id }}">{{ patient.username }} − {{ patient.full_name }}</p></option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <input type="date" class="text-field" name="date" min="2000-01-01" required>
+    </div>
+    <div>
+        <input type="time" class="text-field" name="time" required>
+    </div>
+    <div>
+        <input type="number" class="text-field" name="fees" placeholder="Fees (Optinal)">
+    </div>
+    <div>
+        <textarea class="text-field" name="description" placeholder="Description (Optinal)" rows="5"></textarea>
+    </div>
+    <div>
+        <input class="button" type="submit" value="Add Appointment">
+    </div>
+</form>
+{{ patients|length }}
 
 <script>
-
 </script>
+{% endblock %}
+
+
+{% block style %}
+#title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 25px;
+}
+#title h1, #title div span {
+    font-size: 35px;
+}
+#title div span {
+    color: #0d53fc;
+    margin-right: 10px;
+}
+
+form {
+    margin-top: 20px;
+    margin-left: 25px;
+}
+.text-field {
+    width: 200px;
+    min-height: 20px;
+
+    padding: 10px;
+    margin-bottom: 10px;
+
+    border: 1px solid #0d53fc;
+    border-radius: 4px;
+}
+
+#patient img {
+    width: 5px;
+}
+
+.button {
+    display: block;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    border-radius: 4px;
+    font-weight: 600;
+    margin: 0 10px;
+    width: 200px;
+    padding: 10px 0;
+    box-shadow: 0 0 20px rgba(13, 83, 252, 0.2);
+    transition: 0.4s;
+
+    color: rgb(104, 85, 224);
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px solid #0d53fc;
+}
+
+.button:hover {
+    color: white;
+    box-shadow: 0 0 20px rgba(13, 83, 252, 0.6);
+    background-color: #0d53fc;
+}
+{% endblock %}

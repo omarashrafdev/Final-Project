@@ -6,19 +6,19 @@ from random import randint
 
 def login_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function1(*args, **kwargs):
         if session.get("user_id") is None:
             return redirect("/Login")
         return f(*args, **kwargs)
-    return decorated_function
+    return decorated_function1
 
 def doctors_only(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function2(*args, **kwargs):
         if session.get("user_type") != "Doctor":
             return redirect("/AccessDenied")
         return f(*args, **kwargs)
-    return decorated_function
+    return decorated_function2
 
 def strong_password_check(password):
     if(len(password) >= 8):
@@ -41,9 +41,9 @@ def Years_Between(date1, date2):
 def minutes_between(date1, time1, date2, time2):
     date1 = str(date1)
     date2 = str(date2)
-    days1 = int(date1.split("-")[0]*365) + (int(date1.split("-")[1])*12) + (int(date1.split("-")[2]))
-    days2 = int(date2.split("-")[0]*365) + (int(date2.split("-")[1])*12) + (int(date2.split("-")[2]))
-
+    days1 = int(date1.split("-")[0]*365) + (int(date1.split("-")[1])*30) + (int(date1.split("-")[2]))
+    days2 = int(date2.split("-")[0]*365) + (int(date2.split("-")[1])*30) + (int(date2.split("-")[2]))
+    print(days1-days2)#
     time1 = str(time1)
     time2 = str(time2)
     min1 = days1*24*60 + (int(time1.split(":")[0])*60) + int(time1.split(":")[1])

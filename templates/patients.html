@@ -62,10 +62,8 @@ Home
 <hr>
 <table id="patient_list">
     <thead>
-        <!--
-            <td class="cell"><input type="checkbox" id="select_all" onclick="SelectAll(this)"></td>
-        -->
-        <td class="cell">Basic Info</td>
+        <td class="cell useless_cell"></td>
+        <td class="cell" style="padding-left: 0;">Basic Info</td>
         <td class="cell">Phone Number</td>
         <td class="cell">City</td>
         <td class="cell">Next Appointment</td>
@@ -74,13 +72,11 @@ Home
     </thead>
     {% for patient in patients %}
     <tr class="table_row">
-        <!--
-            <td class="select cell"><input type="checkbox" name="select" id="select"></td>
-        -->
-        <td class="basic_info cell">
-            <div id="image_container"><a href="/Profile-{{ patient.id }}"><img src="/static/media/patients/{{ patient.id }}.png" alt="patient image"></a></div>
-            <div>
-                <p><a href="/Profile-{{ patient.id }}"><b>{{patient.full_name}}</b></a></p>
+        <td class="cell useless_cell"></td>
+        <td class="basic_info cell" style="padding-left: 0;">
+            <div id="image_container"><a href="/Patients/Profile-{{ patient.id }}"><img src="/static/media/patients/{{ patient.id }}.png" alt="patient image"></a></div>
+            <div id="name_and_email">
+                <p><a href="/Patients/Profile-{{ patient.id }}"><b>{{patient.full_name}}</b></a></p>
                 <p><a href="mailto:{{patient.email}}">{{patient.email}}</a></p>
             </div>
         </td>
@@ -190,9 +186,11 @@ td:last-child, th:last-child {
 .cell {
     padding: 5px 15px;
 }
+.useless_cell {
+    padding: 10px;
+}
 .basic_info {
     display: flex;
-    flex-direction: row;
     align-items: center;
 }
 #image_container {
@@ -205,6 +203,7 @@ td:last-child, th:last-child {
     height: 100%;
     border-radius: 50%;
 }
+
 .button {
     display: block;
     text-align: center;

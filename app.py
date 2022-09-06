@@ -1,4 +1,5 @@
 # Import needed libraries
+from email.message import Message
 import os
 import smtplib
 import time
@@ -39,7 +40,7 @@ CITIES = ["Alexandria", "Aswan", "Asyut", "Beheira", "Beni Suef", "Cairo", "Daka
 
 # Today's date to pass to the forms
 TODAY = date.today()
-TIME = time.ctime(time.time()).split(" ")[3][:-3]
+TIME = time.ctime(time.time()).split(" ")[4][:-3]
 
 
 @app.route("/")
@@ -54,12 +55,6 @@ def index():
 
     # Return homapege view
     return render_template("index.html")
-
-
-@app.route("/AddAppointment")
-@login_required
-def add_appointment():
-    return render_template("add_appointment.html")
 
 
 @app.route("/Register", methods=["GET", "POST"])
@@ -220,6 +215,7 @@ def logout():
     return redirect("/")
 
 
+# Patient Section
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
 @doctors_only
@@ -289,12 +285,9 @@ def patients():
                 swap_counter = 0
                 for i in range(0, counter1-j):
                     if minutes_between(
-                            sorted_patients[i]["next_appointment"].split(" ")[
-                                0],
-                            sorted_patients[i]["next_appointment"].split(" ")[
-                                1],
-                            sorted_patients[i +
-                                            1]["next_appointment"].split(" ")[0],
+                            sorted_patients[i]["next_appointment"].split(" ")[0],
+                            sorted_patients[i]["next_appointment"].split(" ")[1],
+                            sorted_patients[i+1]["next_appointment"].split(" ")[0],
                             sorted_patients[i+1]["next_appointment"].split(" ")[1]) > 0:
                         swap(sorted_patients, i, i+1)
                         swap_counter += 1
@@ -303,6 +296,8 @@ def patients():
             return render_template("patients.html", patients=sorted_patients, selected="next_appointment")
 
         elif sort_by == "last_appointment":
+            print("Sorting by: "+sort_by)
+            # Sorting by last_appointment
             sorted_patients = patients.copy()
             length = len(sorted_patients)
 
@@ -321,18 +316,27 @@ def patients():
                 swap_counter = 0
                 for i in range(0, counter1-j):
                     if minutes_between(
-                            sorted_patients[i]["last_appointment"].split(" ")[
-                                0],
-                            sorted_patients[i]["last_appointment"].split(" ")[
-                                1],
-                            sorted_patients[i +
-                                            1]["last_appointment"].split(" ")[0],
-                            sorted_patients[i+1]["last_appointment"].split(" ")[1]) > 0:
+                            sorted_patients[i]["last_appointment"].split(" ")[0],
+                            sorted_patients[i]["last_appointment"].split(" ")[1],
+                            sorted_patients[i+1]["last_appointment"].split(" ")[0],
+                            sorted_patients[i+1]["last_appointment"].split(" ")[1]) < 0:
                         swap(sorted_patients, i, i+1)
                         swap_counter += 1
                 j += 1
 
             return render_template("patients.html", patients=sorted_patients, selected="last_appointment")
+
+
+@app.route("/Patients/Profile-<int:id>")
+@login_required
+@doctors_only
+def patient_profile(id):
+    user_data = db.execute("SELECT * FROM users WHERE id=?", id)[0]
+    user_data["address"] = "El-badr st, 21"
+    user_data["zip"] = 32154
+    user_data["register_date"] = "2004-12-4"
+    user_data["status"] = "Active"
+    return render_template("patient_profile.html", patient=user_data)
 
 
 @app.route("/Patients/Delete-<int:id>")
@@ -343,6 +347,35 @@ def delete_patient(id):
     return redirect("/Patients")
 
 
+@app.route("/AddAppointment", methods=["GET", "POST"])
+@login_required
+@doctors_only
+def add_appointment():
+    patients = db.execute("SELECT * FROM users WHERE is_doctor=False ORDER BY full_name")
+    if request.method == "GET":
+        return render_template("add_appointment.html", patients=patients)
+    else:
+        date = request.form.get("date")
+        time = request.form.get("time")
+        patient_id = request.form.get("patient")
+        fees = request.form.get("fees")
+        description = request.form.get("description")
+
+        appointments = db.execute("SELECT time, date from appointments WHERE doctor_id = ? AND date = ?", session["user_id"], date)
+        
+        for appointment in appointments:
+            if abs(minutes_between(date, time, appointment["date"], appointment["time"])) < 30:
+                error = "You can't add an appointment on this day at " + time + ". Because There's another appointment at " + appointment["time"]
+                return render_template("add_appointment.html", patients = patients, error = error)
+
+        db.execute("INSERT INTO appointments (date, time, patient_id, doctor_id, fees, description) VALUES (?,?,?,?,?,?)",
+                   date, time, patient_id, session["user_id"], fees, description)
+
+        return redirect("/Patients")
+# End of Patient Section
+
+
+# Settings Section
 @app.route("/Settings")
 @login_required
 def settings():
@@ -497,36 +530,49 @@ def edit_info():
 
         # Redirect to home page
         return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
+# End of Settings Section
 
 
+# Help Section
+@app.route("/Help", methods=["GET", "POST"])
+@login_required
+def help():
+    if request.method == "GET":
+        return render_template("help.html")
+    else:
+        name = request.form.get("name")
+        email = request.form.get("email")
+        subject = request.form.get("subject")
+        message = request.form.get("message")
+
+        SUBJECT = "Report from CliMan - " + subject
+        info = "Name: {}\nEmail: {}".format(name, email)
+        MESSAGE = 'Subject: {}\n\n{}\n\nMessage: {}'.format(SUBJECT, info, message)
+
+        # Send message to the new email
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
+        server.sendmail(os.environ["EMAIL"], os.environ["EMAIL"], MESSAGE)
+        server.close()
+
+        return redirect("/")
+# End of Help Section
+
+
+# Profile Section
 @app.route("/Profile-<int:id>")
 @login_required
 def profile(id):
     data = db.execute("SELECT * FROM users WHERE id=?", id)
     return render_template("profile.html", data=data)
+# End of Profile Section
 
 
 @app.route("/AccessDenied")
 @login_required
 def access_denied():
     return render_template("no_access.html")
-
-
-@login_required
-@doctors_only
-@app.route("/AddAppointments", methods=["GET", "POST"])
-def AddAppointments():
-    if request.method == "GET":
-        return render_template("add_appointment.html")
-    else:
-        date = request.form.get("date")
-        time = request.form.get("time")
-        patient_id = request.form.get("patient_id")
-
-        db.execute("INSERT INTO appointments (date, time, patient_id, doctor_id, fees, description) VALUES (?,?,?,?,150,?)",
-                date, time, patient_id, session["user_id"], "ALOOOOOOOO")
-
-        return render_template("add_appointment.html", success="Appintment added")
 
 
 # Error Handlers
@@ -543,3 +589,4 @@ def page_not_found(error):
 @app.errorhandler(502)
 def something_went_wrong(error):
     return render_template('went_wrong.html')
+# End of Error Handlers
