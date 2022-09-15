@@ -1,5 +1,4 @@
 # Import needed libraries
-from email.message import Message
 import os
 import smtplib
 import time
@@ -10,7 +9,7 @@ from flask_session import Session
 from cs50 import SQL
 from datetime import date
 from werkzeug.security import check_password_hash, generate_password_hash
-from random import randint
+from hashlib import md5
 from functions import *
 
 # Configure application
@@ -111,26 +110,25 @@ def Register():
             return render_template("Register.html", error="Your password must be at least 8 characters long. Please try another.", CITIES=CITIES)
         password_hash = generate_password_hash(password)
 
-        # Store profile pic in static media
-        profile_picture = request.files['profile_picture[]']
-        profile_picture.save("static/media/profile_picture.png")
-
         # Store user's data in the database
         if user_type == "doctor":  # For doctors
-            with open("static/media/profile_picture.png", "rb") as pic:
-                db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified, register_date) VALUES (?,?,?,?,?,?,TRUE,?,?,FALSE,?)",
-                        username, password_hash, full_name, city, phone_number, email, date_of_birth, pic.read(), TODAY)
-                session["user_type"] = "Doctor"
+            db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, is_verified, register_date) VALUES (?,?,?,?,?,?,TRUE,?,FALSE,?)",
+                    username, password_hash, full_name, city, phone_number, email, date_of_birth, TODAY)
+            session["user_type"] = "Doctor"
         else:  # For patients
-            with open("static/media/profile_picture.png", "rb") as pic:
-                db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, profile_picture, is_verified, register_date) VALUES (?,?,?,?,?,?,FALSE,?,?,FALSE,?)",
-                        username, password_hash, full_name, city, phone_number, email, date_of_birth, pic.read(), TODAY)
-                session["user_type"] = "Patient"
+            db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, is_verified, register_date) VALUES (?,?,?,?,?,?,FALSE,?,FALSE,?)",
+                    username, password_hash, full_name, city, phone_number, email, date_of_birth, TODAY)
+            session["user_type"] = "Patient"
 
         # Session variables
-        session["user_id"] = db.execute(
-            "SELECT * FROM users WHERE username = ?", username)[0]["id"]
+        session["user_id"] = db.execute("SELECT * FROM users WHERE username = ?", username)[0]["id"]
         session["name"] = full_name
+
+        # Store profile pic in static media
+        profile_picture = request.files['profile_picture[]']
+        hash_object = md5(b'1').hexdigest()
+        path = format("static/media/profile_pictures/{}.png", hash_object)
+        profile_picture.save(path)
 
         # Redirect to home page
         return redirect("/")
@@ -192,6 +190,7 @@ def login():
         else:
             session["user_type"] = "Patient"
 
+        # TODO
         # Store the profile picture
         with open("static/media/profile_picture.png", "wb") as pic:
             profile_binary = db.execute(
@@ -431,6 +430,7 @@ def change_email():
         if len(data) != 0:
             return render_template("change_email.html", error="Email already in use. Please try again.")
 
+        # TODO
         # The message
         TEMP_CODE = generate_random_number()
         message = "\nThis is your code: " + str(TEMP_CODE)
