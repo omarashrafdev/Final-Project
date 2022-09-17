@@ -76,7 +76,7 @@ def Register():
         picture = request.files['picture[]']
 
         # Validate username duplication
-        data = db.execute("SELECT * FROM users WHERE username = ?", username)
+        data = db.execute("SELECT * FROM user_login WHERE username = ?", username)
         if len(data) != 0:
             return render_template("register.html", error="Username already in use\nPlease try another one", CITIES=CITIES)
 
@@ -120,22 +120,24 @@ def Register():
         elif strong_password_check(password) == 2:
             return render_template("register.html", error="Your password must be at least 8 characters long. Please try another.", CITIES=CITIES)
         password_hash = generate_password_hash(password)
-    
-        # Store user's data in the database
-        db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, is_verified, register_date) VALUES (?,?,?,?,?,?,TRUE,?,FALSE,?)",
-                username, password_hash, name, city, phone_number, email, birthday, TODAY)
-        
 
+        # Store picture in the server
+        hash_object = md5(b'1').hexdigest()
+        picture_path = "static/media/pictures/{}.png".format(hash_object)
+        picture.save(picture_path)
+
+        # Store user's data in the database
+        db.execute("Insert INTO users (name, gender, email, phone_number, city, birthday, picture_path) VALUES (?,?,?,?,?,?,?)",
+                name, gender, email, phone_number, city, birthday, picture_path)
+        
         # Session variables
-        session["user_id"] = db.execute("SELECT * FROM users WHERE username = ?", username)[0]["id"]
+        session["user_id"] = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
         session["name"] = name
 
-        # Store profile pic in static media
+        # Store user's login data in the database
+        db.execute("INSERT INTO user_login (user_id, username, password_hash) VALUES (?,?,?)",
+                session["user_id"], username, password_hash)
         
-        hash_object = md5(b'1').hexdigest()
-        path = format("static/media/profile_pictures/{}.png", hash_object)
-        profile_picture.save(path)
-
         # Redirect to home page
         return redirect("/")
 
@@ -173,7 +175,7 @@ def login():
     session.clear()
 
     if request.method == "GET":
-        return render_template("Login.html")
+        return render_template("login.html")
     else:
         # Get username and password
         username = request.form.get("username")
@@ -182,11 +184,11 @@ def login():
         # Validate username
         data = db.execute("SELECT * FROM users WHERE username = ?", username)
         if len(data) != 1:
-            return render_template("Login.html", error="Couldn't find user. Please try again.")
+            return render_template("login.html", error="Couldn't find user. Please try again.")
 
         # Validate password
         if not check_password_hash(data[0]["password_hash"], password):
-            return render_template("Login.html", error="Wrong password. Please try again.")
+            return render_template("login.html", error="Wrong password. Please try again.")
 
         # Store the user id in the session's data
         session["user_id"] = data[0]["id"]
@@ -594,6 +596,5 @@ def page_not_found(code):
 @app.errorhandler(500)
 @app.errorhandler(502)
 def something_went_wrong(code):
-    code = code[0:2]
     return render_template('went_wrong.html')
 # End of Error Handlers
