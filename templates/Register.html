@@ -6,45 +6,48 @@
 
 {% block main %}
     <form method="POST" action="/Register" class="login-form" enctype="multipart/form-data">
-        <small>{{ error }}</small>
         <h1>Sign up</h1>
-        <div style="margin: 5px 0px 10px 0px;">
-            <input class="radio-field" name="user_type" id="doctor" type="radio" required>
-            <label for="doctor" style="margin-right: 40px;">Doctor</label>
-            <input class="radio-field" name="user_type" id="username" type="radio" required>
-            <label for="doctor">Patient</label>
-        </div>
+        {% if error %}
+            <small>{{ error }}</small>
+        {% endif %}
         <div>
             <input class="text-field" name="username" id="username" type="text" placeholder="Username" required>
         </div>
         <div>
-            <input class="text-field" name="full_name" type="text" placeholder="Full name" required>
+            <input class="text-field" name="name" type="text" placeholder="Name" required>
         </div>
         <div>
-            <input class="text-field" name="email" type="email" placeholder="Email address" required>
+            <input class="text-field" name="email" type="email" placeholder="Email Address" required>
         </div>
         <div>
-            <input class="text-field" name="phone_number" type="number" placeholder="Phone number" required>
+            <input class="text-field" name="phone_number" type="number" placeholder="Phone Number" required>
+        </div>
+        <div>
+            <select class="text-field select" name="gender">
+                <option selected disabled>Select Your Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
         </div>
         <div>
             <select class="text-field select" name="city">
-                <option selected disabled>Select your city</option>
+                <option selected disabled>Select Your City</option>
                 {% for city in CITIES %}
                     <option value="{{ city }}">{{ city }}</option>
                 {% endfor %}
             </select>
         </div>
         <div>
-            <input class="text-field" name="date_of_birth" type="date" placeholder="Date of birth" required>
+            <input class="text-field" name="birthday" type="date" required>
         </div>
         <div>
-            <input class="text-field" name="profile_picture[]" type="file" id="profile_pic" required>
+            <input class="text-field" name="picture[]" type="file" id="profile_pic" required>
         </div>
         <div>
             <input class="text-field" name="password1" id="password1" type="password" placeholder="Password" required>
         </div>
         <div>
-            <input class="text-field" name="password2" id="password2" type="password" placeholder="Confirm password" required>
+            <input class="text-field" name="password2" id="password2" type="password" placeholder="Confirm Password" required>
         </div>
         <div>
             <input class="button" type="submit" value="Register">
@@ -64,7 +67,7 @@
             fileExtention = getFileExtention(fileName);
 
             if (fileExtention != allowedExtensions[0] && fileExtention != allowedExtensions[1] && fileExtention != allowedExtensions[2]) {
-                alert('File type is not supported\nOnly (jpg, jpeg, png) files are supported');
+                alert('Image file type is not supported\nOnly (jpg, jpeg, png) files are supported');
                 document.getElementById('file').value = null;
             }
         }
@@ -115,6 +118,7 @@
     }
     .select {
         height: 40px;
+        width: 222px;
     }
 
     .button {

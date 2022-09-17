@@ -2,6 +2,7 @@
 import os
 import smtplib
 import time
+import imghdr
 
 # Import needed functions
 from flask import Flask, redirect, render_template, request, session, url_for
@@ -62,70 +63,75 @@ def Register():
     session.clear()
 
     if request.method == "GET":
-        return render_template("Register.html",  CITIES=CITIES)
+        return render_template("register.html",  CITIES=CITIES)
     else:
         # Data input from the form
-        full_name = request.form.get("full_name")
+        username = request.form.get("username")
+        name = request.form.get("name")
         email = request.form.get("email")
         phone_number = request.form.get("phone_number")
+        gender = request.form.get("gender")
         city = request.form.get("city")
-        username = request.form.get("username")
-        date_of_birth = request.form.get("date_of_birth")
-        user_type = request.form.get("user_type")
+        birthday = request.form.get("birthday")
+        picture = request.files['picture[]']
 
         # Validate username duplication
         data = db.execute("SELECT * FROM users WHERE username = ?", username)
         if len(data) != 0:
-            return render_template("Register.html", error="Username already in use. Please try another one.",
-                                CITIES=CITIES)
+            return render_template("register.html", error="Username already in use\nPlease try another one", CITIES=CITIES)
+
+        # Validate name format
+        # TODO
 
         # Validate email duplication
         data = db.execute("SELECT * FROM users WHERE email = ?", email)
         if len(data) != 0:
-            return render_template("Register.html", error="Email Address is already in use. Please try another one.",
-                                CITIES=CITIES)
+            return render_template("register.html", error="Email Address is already in use\nPlease try another one", CITIES=CITIES)
 
         # Validate phone number duplication
-        data = db.execute(
-            "SELECT * FROM users WHERE phone_number = ?", phone_number)
+        data = db.execute("SELECT * FROM users WHERE phone_number = ?", phone_number)
         if len(data) != 0:
-            return render_template("Register.html", error="Phone number is already in use. Please try another one.",
-                                CITIES=CITIES)
+            return render_template("register.html", error="Phone number is already in use\nPlease try another one", CITIES=CITIES)
 
-        # Validate user's age (older than 15)
-        if Years_Between(date_of_birth, TODAY) < 15:
-            return render_template("Register.html", error="You have to be older than 15 years old to use",
-                                CITIES=CITIES)
+        # Validate gender
+        if gender not in ["male", "female"]:
+            return render_template("register.html", error="Non existing gender selected\nPlease try again", CITIES=CITIES)
+
+        # Validate city
+        if city not in CITIES:
+            return render_template("register.html", error="Non existing city selected\nPlease try again", CITIES=CITIES)
+
+        # Validate user's age (older than 18)
+        if Years_Between(birthday, TODAY) < 18:
+            return render_template("register.html", error="You have to be older than 18 years old to use", CITIES=CITIES)
+
+        # Validate image
+        if imghdr.what(picture) not in ["jpg", "jpeg", "png"]:
+            return render_template("register.html", error="Image file type is not supported\nOnly (jpg, jpeg, png) files are supported", CITIES=CITIES)
 
         # Validate password match
         if request.form.get("password1") != request.form.get("password2"):
-            return render_template("Register.html", error="Passwords don't match. Please try again.",
-                                CITIES=CITIES)
+            return render_template("register.html", error="Passwords don't match. Please try again.", CITIES=CITIES)
 
         # Validate password strength
         password = request.form.get("password1")
         if strong_password_check(password) == 1:
-            return render_template("Register.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.", CITIES=CITIES)
+            return render_template("register.html", error="Please choose a more secure password. It should be longer than 6 characters, unique to you and difficult for others to guess.", CITIES=CITIES)
         elif strong_password_check(password) == 2:
-            return render_template("Register.html", error="Your password must be at least 8 characters long. Please try another.", CITIES=CITIES)
+            return render_template("register.html", error="Your password must be at least 8 characters long. Please try another.", CITIES=CITIES)
         password_hash = generate_password_hash(password)
-
+    
         # Store user's data in the database
-        if user_type == "doctor":  # For doctors
-            db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, is_verified, register_date) VALUES (?,?,?,?,?,?,TRUE,?,FALSE,?)",
-                    username, password_hash, full_name, city, phone_number, email, date_of_birth, TODAY)
-            session["user_type"] = "Doctor"
-        else:  # For patients
-            db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, is_verified, register_date) VALUES (?,?,?,?,?,?,FALSE,?,FALSE,?)",
-                    username, password_hash, full_name, city, phone_number, email, date_of_birth, TODAY)
-            session["user_type"] = "Patient"
+        db.execute("INSERT INTO users (username, password_hash, full_name, city, phone_number, email, is_doctor, date_of_birth, is_verified, register_date) VALUES (?,?,?,?,?,?,TRUE,?,FALSE,?)",
+                username, password_hash, name, city, phone_number, email, birthday, TODAY)
+        
 
         # Session variables
         session["user_id"] = db.execute("SELECT * FROM users WHERE username = ?", username)[0]["id"]
-        session["name"] = full_name
+        session["name"] = name
 
         # Store profile pic in static media
-        profile_picture = request.files['profile_picture[]']
+        
         hash_object = md5(b'1').hexdigest()
         path = format("static/media/profile_pictures/{}.png", hash_object)
         profile_picture.save(path)
@@ -577,8 +583,8 @@ def access_denied():
 
 # Error Handlers
 @app.errorhandler(404)
-def page_not_found(error):
-    return render_template('404.html', title='404'), 404
+def page_not_found(code):
+    return render_template('404.html'), 404
 
 
 @app.errorhandler(400)
@@ -587,6 +593,7 @@ def page_not_found(error):
 @app.errorhandler(405)
 @app.errorhandler(500)
 @app.errorhandler(502)
-def something_went_wrong(error):
+def something_went_wrong(code):
+    code = code[0:2]
     return render_template('went_wrong.html')
 # End of Error Handlers
