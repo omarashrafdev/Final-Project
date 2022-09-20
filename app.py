@@ -1,4 +1,6 @@
 # Import needed libraries
+from crypt import methods
+from email import message
 import os
 import smtplib
 import time
@@ -35,24 +37,45 @@ Session(app)
 db = SQL("sqlite:///database.db")
 
 # Egyption's CITIES list
-CITIES = ["Alexandria", "Aswan", "Asyut", "Beheira", "Beni Suef", "Cairo", "Dakahlia", "Damietta", "Faiyum", "Gharbia", "Giza", "Ismailia", "Kafr El Sheikh",
-        "Luxor", "Matruh", "Minya", "Monufia", "New Valley", "North Sinai", "Port Said", "Qalyubia ", "Qena", "Red Sea", "Sharqia", "Sohag", "South Sinai", "Suez"]
+CITIES = [
+    "Alexandria", 
+    "Aswan", 
+    "Asyut", 
+    "Beheira", 
+    "Beni Suef", 
+    "Cairo", 
+    "Dakahlia", 
+    "Damietta", 
+    "Faiyum", 
+    "Gharbia", 
+    "Giza", 
+    "Ismailia", 
+    "Kafr El Sheikh", 
+    "Luxor", 
+    "Matruh", 
+    "Minya", 
+    "Monufia", 
+    "New Valley", 
+    "North Sinai", 
+    "Port Said", 
+    "Qalyubia ", 
+    "Qena", 
+    "Red Sea", 
+    "Sharqia", 
+    "Sohag", 
+    "South Sinai", 
+    "Suez"
+]
 
 # Today's date to pass to the forms
 TODAY = date.today()
 TIME = time.ctime(time.time()).split(" ")[4][:-3]
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
+@verification_required
 @login_required
 def index():
-    # Essential variables
-    user_id = session["user_id"]
-
-    # Verify email if not verified
-    if not db.execute("SELECT is_verified FROM users WHERE id=?", user_id)[0]["is_verified"]:
-        return redirect("/Rigster/EmailVerify")
-
     # Return homapege view
     return render_template("index.html")
 
@@ -132,7 +155,10 @@ def Register():
         
         # Session variables
         session["user_id"] = db.execute("SELECT id FROM users WHERE email = ?", email)[0]["id"]
+        session["username"] = username
         session["name"] = name
+        session["picture_path"] = picture_path
+        session["is_verified"] = "False"
 
         # Store user's login data in the database
         db.execute("INSERT INTO user_login (user_id, username, password_hash) VALUES (?,?,?)",
@@ -142,31 +168,42 @@ def Register():
         return redirect("/")
 
 
-@app.route("/Rigster/EmailVerify", methods=["GET", "POST"])
+@app.route("/Rigster/EmailVerify", methods=["GET"])
 @login_required
 def EmailVerify():
     global TEMP_CODE
     if request.method == "GET":
-        email = db.execute("SELECT email FROM users WHERE id=?",
-                        session["user_id"])[0]["email"]
+        # Get email from DB
+        email = db.execute("SELECT email FROM users WHERE id=?", session["user_id"])[0]["email"]
+
+        # Sent a code to the email
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.ehlo()
         server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
-        TEMP_CODE = generate_random_number()
-        Message = "\nThis is your code: " + \
-            str(TEMP_CODE) + "\nProvided By Omar Ashraf"
-        server.sendmail(os.environ["EMAIL"], email, Message)
-        server.close()
-        return render_template("Email_Verification.html")
 
+        TEMP_CODE = generate_random_number()
+        subject = "[CliMan] Please verify your account"
+        content = "Hey {}\n\nYou recently created an account on CLIMAN but to use your account you need to verify.\nEnter the verification code on your account to proceed\n\nVerification code: {}".format(session["username"], TEMP_CODE)
+        message = 'Subject: {}\n\n{}\n\nThanks,\nThe CLIMAN Team'.format(subject, content)
+
+        server.sendmail(os.environ["EMAIL"], email, message)
+        server.close()
+        
+        return redirect("/Rigster/EmailVerify/Code")
+
+
+@app.route("/Rigster/EmailVerify/Code", methods=["GET", "POST"])
+def EmailCode():
+    if request.method == "GET":
+        return render_template("email_verification.html")
     else:
         user_code = request.form.get("code")
         if TEMP_CODE == int(user_code):
-            db.execute("UPDATE users SET is_verified=1 WHERE id=?",
-                    session["user_id"])
+            db.execute("UPDATE users SET is_verified=1 WHERE id=?", session["user_id"])
+            session["is_verified"] = "True"
             return redirect("/")
         else:
-            return render_template("Email_Verification.html", error="Wrong code. New one was sent.")
+            return render_template("email_verification.html", error="Wrong code. Please try again")
 
 
 @app.route("/Login", methods=["GET", "POST"])
@@ -182,7 +219,7 @@ def login():
         password = request.form.get("password")
 
         # Validate username
-        data = db.execute("SELECT * FROM users WHERE username = ?", username)
+        data = db.execute("SELECT * FROM user_login WHERE username = ?", username)
         if len(data) != 1:
             return render_template("login.html", error="Couldn't find user. Please try again.")
 
@@ -191,20 +228,17 @@ def login():
             return render_template("login.html", error="Wrong password. Please try again.")
 
         # Store the user id in the session's data
-        session["user_id"] = data[0]["id"]
-        session["name"] = data[0]["full_name"]
-        if data[0]["is_doctor"]:
-            session["user_type"] = "Doctor"
+        user_data = db.execute("SELECT * FROM users WHERE id=?", data[0]["user_id"])
+
+        session["user_id"] = user_data[0]["id"]
+        session["username"] = data[0]["username"]
+        session["name"] = user_data[0]["name"]
+        session["picture_path"] = user_data[0]["picture_path"]
+        if user_data[0]["is_verified"] == 1:
+            session["verified"] = "True"
         else:
-            session["user_type"] = "Patient"
-
-        # TODO
-        # Store the profile picture
-        with open("static/media/profile_picture.png", "wb") as pic:
-            profile_binary = db.execute(
-                "SELECT profile_picture FROM users WHERE id=?", session["user_id"])[0]["profile_picture"]
-            pic.write(profile_binary)
-
+            session["verified"] = "False"
+        
         return redirect("/")
 
 
@@ -214,10 +248,6 @@ def logout():
     # Clear the existing session
     session.clear()
 
-    # Delete profile picture
-    if os.path.exists("static/media/profile_picture.png"):
-        os.remove("static/media/profile_picture.png")
-
     # Redirect user to login form
     return redirect("/")
 
@@ -225,7 +255,6 @@ def logout():
 # Patient Section
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
-@doctors_only
 def patients():
     patients = db.execute(
         "SELECT * FROM users WHERE id IN (SELECT patient_id FROM appointments WHERE doctor_id=?) ORDER BY full_name", session["user_id"])
@@ -336,7 +365,6 @@ def patients():
 
 @app.route("/Patients/Profile-<int:id>")
 @login_required
-@doctors_only
 def patient_profile(id):
     user_data = db.execute("SELECT * FROM users WHERE id=?", id)[0]
     user_data["address"] = "El-badr st, 21"
@@ -348,7 +376,6 @@ def patient_profile(id):
 
 @app.route("/Patients/Delete-<int:id>")
 @login_required
-@doctors_only
 def delete_patient(id):
     db.execute("DELETE FROM appointments WHERE doctor_id=? AND patient_id=?",session["user_id"], id)
     return redirect("/Patients")
@@ -356,7 +383,6 @@ def delete_patient(id):
 
 @app.route("/AddAppointment", methods=["GET", "POST"])
 @login_required
-@doctors_only
 def add_appointment():
     patients = db.execute("SELECT * FROM users WHERE is_doctor=False ORDER BY full_name")
     if request.method == "GET":
@@ -384,12 +410,14 @@ def add_appointment():
 
 # Settings Section
 @app.route("/Settings")
+@verification_required
 @login_required
 def settings():
     return render_template("settings.html")
 
 
 @app.route("/ChangePassword", methods=["GET", "POST"])
+@verification_required
 @login_required
 def change_password():
     if request.method == "GET":
@@ -398,9 +426,8 @@ def change_password():
         # Get old password from the user
         old_password = request.form.get("old_password")
 
+        data = db.execute("SELECT * FROM user_login WHERE user_id = ?", session["user_id"])
         # Validate current password
-        data = db.execute("SELECT * FROM users WHERE id = ?",
-                        session["user_id"])
         if not check_password_hash(data[0]["password_hash"], old_password):
             return render_template("change_password.html", error="Wrong password. Please try again.")
 
@@ -417,14 +444,14 @@ def change_password():
 
         # Update DB to the new password
         password_hash = generate_password_hash(password)
-        db.execute("UPDATE users SET password_hash=? WHERE id=?",
-                password_hash, session["user_id"])
+        db.execute("UPDATE user_login SET password_hash=? WHERE user_id=?", password_hash, session["user_id"])
 
         # Return the success message to the user
         return render_template("change_password.html", success="Password changed successfully.")
 
 
 @app.route("/ChangeEmail", methods=["GET", "POST"])
+@verification_required
 @login_required
 def change_email():
     if request.method == "GET":
@@ -455,6 +482,7 @@ def change_email():
 
 
 @app.route("/VerifyNewEmail/<email>", methods=["GET", "POST"])
+@verification_required
 @login_required
 def verify_new_email(email):
     if request.method == "GET":
@@ -476,6 +504,7 @@ def verify_new_email(email):
 
 
 @app.route("/EditInfo", methods=["GET", "POST"])
+@verification_required
 @login_required
 def edit_info():
     data = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
@@ -543,6 +572,7 @@ def edit_info():
 
 # Help Section
 @app.route("/Help", methods=["GET", "POST"])
+@verification_required
 @login_required
 def help():
     if request.method == "GET":
@@ -570,6 +600,7 @@ def help():
 
 # Profile Section
 @app.route("/Profile-<int:id>")
+@verification_required
 @login_required
 def profile(id):
     data = db.execute("SELECT * FROM users WHERE id=?", id)
@@ -577,16 +608,11 @@ def profile(id):
 # End of Profile Section
 
 
-@app.route("/AccessDenied")
-@login_required
-def access_denied():
-    return render_template("no_access.html")
-
-
 # Error Handlers
 @app.errorhandler(404)
-def page_not_found(code):
-    return render_template('404.html'), 404
+def page_not_found(e):
+    code = str(e)[0:3]
+    return render_template('404.html', code=code)
 
 
 @app.errorhandler(400)
@@ -595,6 +621,7 @@ def page_not_found(code):
 @app.errorhandler(405)
 @app.errorhandler(500)
 @app.errorhandler(502)
-def something_went_wrong(code):
-    return render_template('went_wrong.html')
+def something_went_wrong(e):
+    code = str(e)[0:3]
+    return render_template('went_wrong.html', code=code)
 # End of Error Handlers

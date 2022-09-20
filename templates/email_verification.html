@@ -5,30 +5,22 @@ Home
 {% endblock %}
 
 {% block sidebar %}
-<a href="/" class="sidebar_hover sidebar_element">
+<a href="/" class="sidebar_active sidebar_hover sidebar_element">
     <span class="material-icons md-48">speed</span>
     <p>Dashboard</p>
 </a>
-{% if session["user_type"] == 'Doctor' %}
 <a href="/Patients" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">group</span>
     <p>Patient list</p>
 </a>
-{% endif %}
-{% if session["user_type"] == 'Patient' %}
-<a href="/Appointments" class="sidebar_hover sidebar_element">
-    <span class="material-icons md-48">calendar_month</span>
-    <p>My Appointments</p>
-</a>
-{% endif %}
-<a href="/Settings" class="sidebar_active sidebar_hover sidebar_element">
+<a href="/Settings" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">settings</span>
     <p>Settings</p>
 </a>
 {% endblock %}
 
 {% block main %}
-<form method="POST" action="/Rigster/EmailVerify" class="login-form">
+<form method="POST" action="/Rigster/EmailVerify/Code" class="login-form">
     <h1>Verify your email address</h1>
     <p>Enter the 6-digit code we sent you to change your email address</p>
     <small class="error">{{ error }}</small>

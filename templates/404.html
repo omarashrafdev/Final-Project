@@ -5,22 +5,14 @@ Settings
 {% endblock %}
 
 {% block sidebar %}
-<a href="/" class="sidebar_hover sidebar_element">
+<a href="/" class="sidebar_active sidebar_hover sidebar_element">
     <span class="material-icons md-48">speed</span>
     <p>Dashboard</p>
 </a>
-{% if session["user_type"] == 'Doctor' %}
 <a href="/Patients" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">group</span>
     <p>Patient list</p>
 </a>
-{% endif %}
-{% if session["user_type"] == 'Patient' %}
-<a href="/Appointments" class="sidebar_hover sidebar_element">
-    <span class="material-icons md-48">calendar_month</span>
-    <p>My Appointments</p>
-</a>
-{% endif %}
 <a href="/Settings" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">settings</span>
     <p>Settings</p>
@@ -28,7 +20,9 @@ Settings
 {% endblock %}
 
 {% block main %}
+<h1 style="font-size: 100px;">{{code}}</h1>
 <h1>Page not found</h1>
+<br>
 <p>Return to <a href="/" class="link">home page</a></p>
 {% endblock %}
 

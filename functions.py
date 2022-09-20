@@ -12,11 +12,11 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function1
 
-def doctors_only(f):
+def verification_required(f):
     @wraps(f)
     def decorated_function2(*args, **kwargs):
-        if session.get("user_type") != "Doctor":
-            return redirect("/AccessDenied")
+        if session.get("is_verified") is "False":
+            return redirect("/Rigster/EmailVerify")
         return f(*args, **kwargs)
     return decorated_function2
 
