@@ -1,8 +1,5 @@
 # Import needed libraries
-from crypt import methods
-from email import message
 import os
-import smtplib
 import time
 import imghdr
 
@@ -73,7 +70,6 @@ TIME = time.ctime(time.time()).split(" ")[4][:-3]
 
 
 @app.route("/", methods=["GET"])
-@verification_required
 @login_required
 def index():
     # Return homapege view
@@ -161,11 +157,10 @@ def Register():
         session["is_verified"] = "False"
 
         # Store user's login data in the database
-        db.execute("INSERT INTO user_login (user_id, username, password_hash) VALUES (?,?,?)",
-                session["user_id"], username, password_hash)
+        db.execute("INSERT INTO user_login (user_id, username, password_hash) VALUES (?,?,?)", session["user_id"], username, password_hash)
         
         # Redirect to home page
-        return redirect("/")
+        return redirect("/Rigster/EmailVerify")
 
 
 @app.route("/Rigster/EmailVerify", methods=["GET"])
@@ -177,22 +172,16 @@ def EmailVerify():
         email = db.execute("SELECT email FROM users WHERE id=?", session["user_id"])[0]["email"]
 
         # Sent a code to the email
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
-
         TEMP_CODE = generate_random_number()
         subject = "[CliMan] Please verify your account"
-        content = "Hey {}\n\nYou recently created an account on CLIMAN but to use your account you need to verify.\nEnter the verification code on your account to proceed\n\nVerification code: {}".format(session["username"], TEMP_CODE)
-        message = 'Subject: {}\n\n{}\n\nThanks,\nThe CLIMAN Team'.format(subject, content)
-
-        server.sendmail(os.environ["EMAIL"], email, message)
-        server.close()
+        content = "Hey {}\n\nYou recently created an account on CLIMAN but to use your account you need to verify.\nEnter the verification code on your account to proceed\n\nVerification code: {}\n\nThanks,\nThe CLIMAN Team".format(session["username"], TEMP_CODE)
+        sene_mail(email, subject, content)
         
         return redirect("/Rigster/EmailVerify/Code")
 
 
 @app.route("/Rigster/EmailVerify/Code", methods=["GET", "POST"])
+@login_required
 def EmailCode():
     if request.method == "GET":
         return render_template("email_verification.html")
@@ -256,8 +245,7 @@ def logout():
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
 def patients():
-    patients = db.execute(
-        "SELECT * FROM users WHERE id IN (SELECT patient_id FROM appointments WHERE doctor_id=?) ORDER BY full_name", session["user_id"])
+    patients = db.execute("SELECT * FROM users WHERE id IN (SELECT patient_id FROM appointments WHERE doctor_id=?) ORDER BY full_name", session["user_id"])
 
     for patient in patients:
         # list of appointments for this patient
@@ -410,14 +398,12 @@ def add_appointment():
 
 # Settings Section
 @app.route("/Settings")
-@verification_required
 @login_required
 def settings():
     return render_template("settings.html")
 
 
 @app.route("/ChangePassword", methods=["GET", "POST"])
-@verification_required
 @login_required
 def change_password():
     if request.method == "GET":
@@ -426,7 +412,7 @@ def change_password():
         # Get old password from the user
         old_password = request.form.get("old_password")
 
-        data = db.execute("SELECT * FROM user_login WHERE user_id = ?", session["user_id"])
+        data = db.execute("SELECT password_hash FROM user_login WHERE user_id = ?", session["user_id"])
         # Validate current password
         if not check_password_hash(data[0]["password_hash"], old_password):
             return render_template("change_password.html", error="Wrong password. Please try again.")
@@ -451,7 +437,6 @@ def change_password():
 
 
 @app.route("/ChangeEmail", methods=["GET", "POST"])
-@verification_required
 @login_required
 def change_email():
     if request.method == "GET":
@@ -465,24 +450,23 @@ def change_email():
         if len(data) != 0:
             return render_template("change_email.html", error="Email already in use. Please try again.")
 
-        # TODO
+        # TODO - Token
         # The message
         TEMP_CODE = generate_random_number()
         message = "\nThis is your code: " + str(TEMP_CODE)
 
-        # Send message to the new email
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
-        server.sendmail(os.environ["EMAIL"], email, message)
-        server.close()
+        # Sent a code to the email
+        TEMP_CODE = generate_random_number()
+        subject = "[CliMan] Please verify your email"
+        content = "Hey {}\n\nYou recently requested to change your email for account on CLIMAN. Please verify this email.\nEnter the verification code on your account to proceed\n\nVerification code: {}\n\nThanks,\nThe CLIMAN Team".format(session["username"], TEMP_CODE)
+        sene_mail(email, subject, content)
 
         # Redirect to the verify function to verify the new email with the code
         return redirect(url_for("verify_new_email", email=email))
 
 
+# TODO - Bug _Custom email passed through url_
 @app.route("/VerifyNewEmail/<email>", methods=["GET", "POST"])
-@verification_required
 @login_required
 def verify_new_email(email):
     if request.method == "GET":
@@ -493,86 +477,97 @@ def verify_new_email(email):
 
         # Validate code
         if code != TEMP_CODE:
-            return render_template("verify_new_email.html", error="Wrong code. New one was sent.", email=email)
+            return render_template("verify_new_email.html", error="Wrong code. Please try again.", email=email)
 
         # Update the email in the database
-        db.execute("UPDATE users SET email=? WHERE id=?",
-                email, session["user_id"])
+        db.execute("UPDATE users SET email=? WHERE id=?", email, session["user_id"])
 
         # Redirect to home page
         return redirect("/")
 
 
 @app.route("/EditInfo", methods=["GET", "POST"])
-@verification_required
 @login_required
 def edit_info():
     data = db.execute("SELECT * FROM users WHERE id=?", session["user_id"])[0]
+    data["username"] = db.execute("SELECT username FROM user_login WHERE user_id=?", session["user_id"])[0]["username"]
     if request.method == "GET":
+        print(session["picture_path"])
         return render_template("edit_info.html", data=data, CITIES=CITIES)
     else:
+        Edited = False
+
         # Data input from the form
         username = request.form.get("username")
-        full_name = request.form.get("full_name")
+        name = request.form.get("name")
         phone_number = request.form.get("phone_number")
         city = request.form.get("city")
-        date_of_birth = request.form.get("date_of_birth")
-        profile_picture = request.files['profile_picture[]']
+        birthday = request.form.get("birthday")
+        picture = request.files['profile_picture[]']
 
         # Validate username duplication and update db if valid
         if username:
-            data_test = db.execute(
-                "SELECT * FROM users WHERE username = ? AND is_doctor = TRUE", username)
+            data_test = db.execute("SELECT * FROM user_login WHERE username=?", username)
             if len(data_test) != 0:
-                return render_template("edit_info.html", error1="Username already in use. Please try another one.",
-                                    data=data, CITIES=CITIES)
-            db.execute("UPDATE users SET username=? WHERE id=?",
-                    username, session["user_id"])
+                return render_template("edit_info.html", error1="Username already in use. Please try another one.", data=data, CITIES=CITIES)
+            db.execute("UPDATE user_login SET username=? WHERE user_id=?", username, session["user_id"])
+            session["username"] = username
+            data["username"] = username
+            Edited = True
 
         # Validate phone number duplication and update db if valid
         if phone_number:
-            data_test = db.execute(
-                "SELECT * FROM users WHERE phone_number = ? AND is_doctor = TRUE", phone_number)
+            data_test = db.execute("SELECT * FROM users WHERE phone_number=?", phone_number)
             if len(data_test) != 0:
-                return render_template("edit_info.html", error2="Phone number is already in use. Please try another one.",
-                                    data=data, CITIES=CITIES)
-            db.execute("UPDATE users SET phone_number=? WHERE id=?",
-                    phone_number, session["user_id"])
+                return render_template("edit_info.html", error2="Phone number is already in use. Please try another one.", data=data, CITIES=CITIES)
+            db.execute("UPDATE users SET phone_number=? WHERE id=?", phone_number, session["user_id"])
+            data["phone_number"] = phone_number
+            Edited = True
 
         # Validate user's age (older than 15) and update db if valid
-        if date_of_birth:
-            if Years_Between(date_of_birth, TODAY) < 15:
-                return render_template("edit_info.html", error3="You have to be older than 15 years old to use",
-                                    data=data, CITIES=CITIES)
-            db.execute("UPDATE users SET date_of_birth=? WHERE id=?",
-                    date_of_birth, session["user_id"])
+        if birthday:
+            if Years_Between(birthday, TODAY) < 15:
+                return render_template("edit_info.html", error3="You have to be older than 15 years old to use", data=data, CITIES=CITIES)
+            db.execute("UPDATE users SET birthday=? WHERE id=?", birthday, session["user_id"])
+            data["birthday"] = birthday
+            Edited = True
 
         # Update data if edited
-        if full_name:
-            db.execute("UPDATE users SET full_name=? WHERE id=?",
-                    full_name, session["user_id"])
+        if name:
+            db.execute("UPDATE users SET name=? WHERE id=?", name, session["user_id"])
+            session["name"] = name
+            data["birthday"] = birthday
+            Edited = True
         if city:
-            db.execute("UPDATE users SET city=? WHERE id=?",
-                    city, session["user_id"])
+            db.execute("UPDATE users SET city=? WHERE id=?", city, session["user_id"])
+            data["city"] = city
+            Edited = True
 
-        # Store profile pic in static media
-        profile_picture = request.files['profile_picture[]']
-        if str(profile_picture) != "<FileStorage: '' ('application/octet-stream')>":
-            profile_picture.save("static/media/profile_picture.png")
-            with open("static/media/profile_picture.png", "rb") as pic:
-                db.execute("UPDATE users SET profile_picture=? WHERE id=?",
-                        pic.read(), session["user_id"])
-
-        session["full_name"] = full_name
+        # Update profile pic
+        if str(picture) != "<FileStorage: '' ('application/octet-stream')>":
+            # Deleting current image
+            if os.path.exists(session["picture_path"]):
+                os.remove(session["picture_path"])
+            
+            # Storing new image
+            hash_object = md5(str(session["user_id"]).encode()).hexdigest()
+            picture_path = "static/media/pictures/{}.png".format(hash_object)
+            picture.save(picture_path)
+            db.execute("UPDATE users SET picture_path=? WHERE id=?", picture_path, session["user_id"])
+            session["picture_path"] = picture_path
+            Edited = True
 
         # Redirect to home page
-        return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
+        if Edited:
+            return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
+        else:
+            return render_template("edit_info.html", data=data, CITIES=CITIES)
+
 # End of Settings Section
 
 
 # Help Section
 @app.route("/Help", methods=["GET", "POST"])
-@verification_required
 @login_required
 def help():
     if request.method == "GET":
@@ -583,24 +578,18 @@ def help():
         subject = request.form.get("subject")
         message = request.form.get("message")
 
-        SUBJECT = "Report from CliMan - " + subject
-        info = "Name: {}\nEmail: {}".format(name, email)
-        MESSAGE = 'Subject: {}\n\n{}\n\nMessage: {}'.format(SUBJECT, info, message)
+        subject = "[CliMan] Report from {} - {}".format(session["username"], subject)
+        content = "Name: {}\nEmail: {}\n\nMessage: {}".format(name, email, message)
 
         # Send message to the new email
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
-        server.sendmail(os.environ["EMAIL"], os.environ["EMAIL"], MESSAGE)
-        server.close()
+        sene_mail(os.environ["EMAIL"], subject, content)
 
-        return redirect("/")
+        return render_template("thank_you.html")
 # End of Help Section
 
 
 # Profile Section
 @app.route("/Profile-<int:id>")
-@verification_required
 @login_required
 def profile(id):
     data = db.execute("SELECT * FROM users WHERE id=?", id)

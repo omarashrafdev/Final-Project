@@ -1,4 +1,6 @@
+import os
 import re
+import smtplib
 from flask import redirect, session
 from functools import wraps
 from math import floor
@@ -11,14 +13,6 @@ def login_required(f):
             return redirect("/Login")
         return f(*args, **kwargs)
     return decorated_function1
-
-def verification_required(f):
-    @wraps(f)
-    def decorated_function2(*args, **kwargs):
-        if session.get("is_verified") is "False":
-            return redirect("/Rigster/EmailVerify")
-        return f(*args, **kwargs)
-    return decorated_function2
 
 def strong_password_check(password):
     if(len(password) >= 8):
@@ -58,3 +52,13 @@ def swap(list, index1, index2):
     temp = list[index1]
     list[index1] = list[index2]
     list[index2] = temp
+
+def sene_mail(email, subject, content):
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.ehlo()
+    server.login(os.environ["EMAIL"], os.environ["PASSWORD"])
+
+    message = 'Subject: {}\n\n{}'.format(subject, content)
+
+    server.sendmail(os.environ["EMAIL"], email, message)
+    server.close()

@@ -5,138 +5,134 @@ Home
 {% endblock %}
 
 {% block sidebar %}
-<a href="/" class="sidebar_active sidebar_hover sidebar_element">
-    <span class="material-icons md-48">speed</span>
-    <p>Dashboard</p>
-</a>
-<a href="/Patients" class="sidebar_hover sidebar_element">
-    <span class="material-icons md-48">group</span>
-    <p>Patient list</p>
-</a>
-<a href="/Settings" class="sidebar_hover sidebar_element">
-    <span class="material-icons md-48">settings</span>
-    <p>Settings</p>
-</a>
+    <a href="/" class="sidebar_active sidebar_hover sidebar_element">
+        <span class="material-icons md-48">speed</span>
+        <p>Dashboard</p>
+    </a>
+    <a href="/Patients" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">group</span>
+        <p>Patient list</p>
+    </a>
+    <a href="/Settings" class="sidebar_hover sidebar_element">
+        <span class="material-icons md-48">settings</span>
+        <p>Settings</p>
+    </a>
 {% endblock %}
 
 {% block main %}
-<form method="POST" action="/EditInfo" class="login-form" enctype="multipart/form-data">
-    {% if success %}<small id="success">{{ success }}</small>{% endif %}
-    <h1>Username</h1>
-    {% if error1 %}<small id="error">{{ error1 }}</small>{% endif %}
-    <div>
-        <input class="text-field" name="username" id="username" type="text" disabled value="{{ data[" username"] }}"
-            required>
-        <a id="button" onclick="editUsername()"><span class="material-icons md-48">edit</span></a>
-    </div>
-    <hr>
-    <br>
+    <form method="POST" action="/EditInfo" class="login-form" enctype="multipart/form-data">
+        {% if success %}<small id="success">{{ success }}</small>{% endif %}
+        <h1>Username</h1>
+        {% if error1 %}<small id="error">{{ error1 }}</small>{% endif %}
+        <div>
+            <input class="text-field" name="username" id="username" type="text" disabled value="{{ data["username"] }}" required>
+            <a id="button" onclick="editUsername()"><span class="material-icons md-48">edit</span></a>
+        </div>
+        <hr>
+        <br>
 
-    <h1>Full name</h1>
-    <div>
-        <input class="text-field" name="full_name" id="full_name" type="text" disabled value="{{ data[" full_name"] }}"
-            required>
-        <a id="button" onclick="editName()"><span class="material-icons md-48">edit</span></a>
-    </div>
-    <hr>
-    <br>
+        <h1>Name</h1>
+        <div>
+            <input class="text-field" name="full_name" id="full_name" type="text" disabled value="{{ data["name"] }}" required>
+            <a id="button" onclick="editName()"><span class="material-icons md-48">edit</span></a>
+        </div>
+        <hr>
+        <br>
 
-    <h1>Email address</h1>
-    <div>
-        <input class="text-field" name="email" type="email" disabled value="{{ data[" email"] }}" required>
-        <a id="button" href="/ChangeEmail"><span class="material-icons md-48">edit</span></a>
-    </div>
-    <hr>
-    <br>
+        <h1>Email Address</h1>
+        <div>
+            <input class="text-field" name="email" type="email" disabled value="{{ data["email"] }}" required>
+            <a id="button" href="/ChangeEmail"><span class="material-icons md-48">edit</span></a>
+        </div>
+        <hr>
+        <br>
 
-    <h1>Phone number</h1>
-    {% if error2 %}<small id="error">{{ error2 }}</small>{% endif %}
-    <div>
-        <input class="text-field" name="phone_number" id="phone_number" type="number" disabled value="{{ data["
-            phone_number"] }}" required>
-        <a id="button" onclick="editPhoneNumber()"><span class="material-icons md-48">edit</span></a>
-    </div>
-    <hr>
-    <br>
+        <h1>Phone Number</h1>
+        {% if error2 %}<small id="error">{{ error2 }}</small>{% endif %}
+        <div>
+            <input class="text-field" name="phone_number" id="phone_number" type="number" disabled value="{{ data["phone_number"] }}" required>
+            <a id="button" onclick="editPhoneNumber()"><span class="material-icons md-48">edit</span></a>
+        </div>
+        <hr>
+        <br>
 
-    <h1>City</h1>
-    <div>
-        <select disabled class="text-field select" name="city" id="city">
-            <option selected disabled value="{{ data[" city"] }}">{{ data["city"] }}</option>
-            {% for city in CITIES %}
-            <option value="{{ city }}">{{ city }}</option>
-            {% endfor %}
-        </select>
-        <a id="button" onclick="editCity()"><span class="material-icons md-48">edit</span></a>
-    </div>
-    <hr>
-    <br>
+        <h1>City</h1>
+        <div>
+            <select disabled class="text-field select" name="city" id="city">
+                <option selected disabled value="{{ data["city"] }}">{{ data["city"] }}</option>
+                {% for city in CITIES %}
+                    <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+            </select>
+            <a id="button" onclick="editCity()"><span class="material-icons md-48">edit</span></a>
+        </div>
+        <hr>
+        <br>
 
-    <h1>Date of birth</h1>
-    {% if error3 %}<small id="error">{{ error3 }}</small>{% endif %}
-    <div>
-        <input class="text-field" name="date_of_birth" id="date_of_birth" type="date" disabled value="{{ data["
-            date_of_birth"] }}" required>
-        <a id="button" onclick="editDateOfBirth()"><span class="material-icons md-48">edit</span></a>
-    </div>
-    <hr>
-    <br>
+        <h1>Birthday</h1>
+        {% if error3 %}<small id="error">{{ error3 }}</small>{% endif %}
+        <div>
+            <input class="text-field" name="birthday" id="birthday" type="date" disabled value="{{ data["birthday"] }}" required>
+            <a id="button" onclick="editBirthday()"><span class="material-icons md-48">edit</span></a>
+        </div>
+        <hr>
+        <br>
 
-    <h1>Profile picture</h1>
-    <div id="profile_picture_container">
-        <div id="profile_picture"><img alt="Profile Picture" src="/static/media/profile_picture.png"></div>
-        <input hidden class="text-field" name="profile_picture[]" type="file" id="profile_pic">
-        <label for="profile_pic">
-            <a id="button"><span class="material-icons md-48">edit</span></a>
-        </label>
-    </div>
-    <br>
-    <br>
-    <br>
+        <h1>Profile Picture</h1>
+        <div id="profile_picture_container">
+            <div id="profile_picture"><img alt="Profile Picture" src="/{{session["picture_path"]}}"></div>
+            <input hidden class="text-field" name="profile_picture[]" type="file" id="profile_pic">
+            <label for="profile_pic">
+                <a id="button"><span class="material-icons md-48">edit</span></a>
+            </label>
+        </div>
+        <br>
+        <br>
+        <br>
 
-    <div>
-        <input class="button" type="submit" value="Update information">
-    </div>
-</form>
-<script>
-    var fileInput = document.getElementById('profile_pic');
-    fileInput.onchange = function () {
-        document.getElementById('profile_pic').removeAttribute('hidden');
-        document.getElementById('profile_picture').setAttribute("style", "display: none;");
-        var filePath = fileInput.value;
-        fileNameArray = filePath.split("\\");
-        fileName = fileNameArray[fileNameArray.length - 1];
+        <div>
+            <input class="button" type="submit" value="Update information">
+        </div>
+    </form>
+    <script>
+        var fileInput = document.getElementById('profile_pic');
+        fileInput.onchange = function () {
+            document.getElementById('profile_pic').removeAttribute('hidden');
+            document.getElementById('profile_picture').setAttribute("style", "display: none;");
+            var filePath = fileInput.value;
+            fileNameArray = filePath.split("\\");
+            fileName = fileNameArray[fileNameArray.length - 1];
 
-        // Allowed file types
-        var allowedExtensions = ["jpg", "jpeg", "png"];
+            // Allowed file types
+            var allowedExtensions = ["jpg", "jpeg", "png"];
 
-        fileExtention = getFileExtention(fileName);
+            fileExtention = getFileExtention(fileName).toLowerCase();
 
-        if (fileExtention != allowedExtensions[0] && fileExtention != allowedExtensions[1] && fileExtention != allowedExtensions[2]) {
-            alert('File type is not supported\nOnly (jpg, jpeg, png) files are supported');
-            document.getElementById('file').value = null;
+            if (fileExtention != allowedExtensions[0] && fileExtention != allowedExtensions[1] && fileExtention != allowedExtensions[2]) {
+                alert('File type is not supported\nOnly (jpg, jpeg, png) files are supported');
+                document.getElementById('file').value = null;
+            }
         }
-    }
-    function getFileExtention(filename) {
-        return filename.split('.').pop();
-    }
+        function getFileExtention(filename) {
+            return filename.split('.').pop();
+        }
 
-    function editUsername() {
-        document.getElementById('username').removeAttribute('disabled');
-    }
-    function editName() {
-        document.getElementById('full_name').removeAttribute('disabled');
-    }
-    function editPhoneNumber() {
-        document.getElementById('phone_number').removeAttribute('disabled');
-    }
-    function editCity() {
-        document.getElementById('city').removeAttribute('disabled');
-    }
-    function editDateOfBirth() {
-        document.getElementById('date_of_birth').removeAttribute('disabled');
-    }
-</script>
+        function editUsername() {
+            document.getElementById('username').removeAttribute('disabled');
+        }
+        function editName() {
+            document.getElementById('full_name').removeAttribute('disabled');
+        }
+        function editPhoneNumber() {
+            document.getElementById('phone_number').removeAttribute('disabled');
+        }
+        function editCity() {
+            document.getElementById('city').removeAttribute('disabled');
+        }
+        function editBirthday() {
+            document.getElementById('birthday').removeAttribute('disabled');
+        }
+    </script>
 {% endblock %}
 
 {% block style %}
@@ -221,9 +217,11 @@ align-items: center;
 #profile_picture {
 width: 100px;
 height: 100px;
+
 padding-right: 25px;
 }
 #profile_picture img {
+border-radius: 50%;
 width: 100%;
 height: 100%;
 }

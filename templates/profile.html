@@ -22,7 +22,7 @@ Profile
 {% block main %}
 <section id="area">
     <header>
-        <div id="profile_pic"><img alt="Profile Picture" src="/static/media/profile_picture.png"></div>
+        <div id="profile_pic"><img alt="Profile Picture" src="/{{session["picture_path"]}}"></div>
         <h1>{{ session["name"] }}</h1>
     </header>
 </section>
