@@ -1,7 +1,10 @@
 # Import needed libraries
+from crypt import methods
 import os
 import time
 import imghdr
+import traceback
+from turtle import pos
 
 # Import needed functions
 from flask import Flask, redirect, render_template, request, session, url_for
@@ -141,8 +144,11 @@ def Register():
         password_hash = generate_password_hash(password)
 
         # Store picture in the server
-        hash_object = md5(b'1').hexdigest()
+        hash_object = md5(str(generate_random_number()).encode()).hexdigest()
         picture_path = "static/media/pictures/{}.png".format(hash_object)
+        while os.path.exists(picture_path):
+            hash_object = md5(str(generate_random_number()).encode()).hexdigest()
+            picture_path = "static/media/pictures/{}.png".format(hash_object)
         picture.save(picture_path)
 
         # Store user's data in the database
@@ -245,10 +251,10 @@ def logout():
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
 def patients():
-    patients_id = db.execute("SELECT * FROM user_patients WHERE user_id=?", session["user_id"])
-    patients = db.execute("SELECT * FROM patients WHERE id=?", patients_id)
-    appointments = db.execute("SELECT * FROM WHERE")
-
+    # patients_id = db.execute("SELECT * FROM user_patients WHERE user_id=?", session["user_id"])
+    # patients = db.execute("SELECT * FROM patients WHERE id=?", patients_id)
+    # appointments = db.execute("SELECT * FROM WHERE")
+    '''
     for patient in patients:
         # list of appointments for this patient
         appointments = db.execute(
@@ -282,9 +288,9 @@ def patients():
             profile_binary = db.execute("SELECT profile_picture FROM users WHERE id=?", id)[
                 0]["profile_picture"]
             pic.write(profile_binary)
-
+    '''
     if request.method == "GET":
-        return render_template("patients.html", patients=patients, selected="name")
+        return render_template("patients.html", selected="name")
 
     else:
         sort_by = request.form.get("sort_by")
@@ -371,12 +377,78 @@ def delete_patient(id):
     return redirect("/Patients")
 
 
+@app.route("/AddPatient", methods=["GET", "POST"])
+@login_required
+def add_patient():
+    if request.method == "GET":
+        return render_template("add_patient.html", CITIES=CITIES)
+    else:
+        print("Begin")
+        # Data input from the form
+        name = request.form.get("name")
+        email = request.form.get("email")
+        gender = request.form.get("gender")
+        birthday = request.form.get("birthday")
+        phone_number = request.form.get("phone_number")
+        address = request.form.get("address")
+        city = request.form.get("city")
+        postal_code = request.form.get("postal_code")
+        occupation = request.form.get("occupation")
+        print("Before Passed")
+        picture = request.files['picture']
+        print("Passed")
+        
+
+        # Validate name format
+        # TODO
+
+        # Validate email duplication
+        data = db.execute("SELECT * FROM patients WHERE email = ?", email)
+        if len(data) != 0:
+            return render_template("add_patient.html", error="Email Address is already in use\nPlease try another one", CITIES=CITIES)
+        print("Passed")
+        # Validate phone number duplication
+        data = db.execute("SELECT * FROM patients WHERE phone_number = ?", phone_number)
+        if len(data) != 0:
+            return render_template("add_patient.html", error="Phone number is already in use\nPlease try another one", CITIES=CITIES)
+        print("Passed")
+        # Validate gender
+        if gender not in ["male", "female"]:
+            return render_template("add_patient.html", error="Non existing gender selected\nPlease try again", CITIES=CITIES)
+        print("Passed")
+        # Validate city
+        if city not in CITIES:
+            return render_template("add_patient.html", error="Non existing city selected\nPlease try again", CITIES=CITIES)
+        print("Passed")
+        # Validate ZIP
+        if len(postal_code) != 5:
+            return render_template("add_patient.html", error="Invalid postal code\nPlease try again", CITIES=CITIES)
+        print("Passed")
+        # Validate image
+        if imghdr.what(picture) not in ["jpg", "jpeg", "png"]:
+            return render_template("add_patient.html", error="Image file type is not supported\nOnly (jpg, jpeg, png) files are supported", CITIES=CITIES)
+        print("Passed")
+        # Store picture in the server
+        hash_object = md5(str(generate_random_number()).encode()).hexdigest()
+        picture_path = "static/media/pictures/{}.png".format(hash_object)
+        while os.path.exists(picture_path):
+            hash_object = md5(str(generate_random_number()).encode()).hexdigest()
+            picture_path = "static/media/pictures/{}.png".format(hash_object)
+        picture.save(picture_path)
+
+        # Store user's data in the database
+        db.execute("Insert INTO patients (name, email, gender, birthday, phone_number, address, city, postal_code, occupation, register_date, picture_path) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                name, email, gender, birthday, phone_number, address, city, postal_code, occupation, TODAY, picture_path)
+        
+        return render_template("add_patient.html", error="Success", CITIES=CITIES)
+
+
+
 @app.route("/AddAppointment", methods=["GET", "POST"])
 @login_required
 def add_appointment():
-    patients = db.execute("SELECT * FROM users WHERE is_doctor=False ORDER BY full_name")
     if request.method == "GET":
-        return render_template("add_appointment.html", patients=patients)
+        return render_template("add_appointment.html")
     else:
         date = request.form.get("date")
         time = request.form.get("time")
@@ -552,8 +624,11 @@ def edit_info():
                 os.remove(session["picture_path"])
             
             # Storing new image
-            hash_object = md5(str(session["user_id"]).encode()).hexdigest()
+            hash_object = md5(str(generate_random_number()).encode()).hexdigest()
             picture_path = "static/media/pictures/{}.png".format(hash_object)
+            while os.path.exists(picture_path):
+                hash_object = md5(str(generate_random_number()).encode()).hexdigest()
+                picture_path = "static/media/pictures/{}.png".format(hash_object)
             picture.save(picture_path)
             db.execute("UPDATE users SET picture_path=? WHERE id=?", picture_path, session["user_id"])
             session["picture_path"] = picture_path
@@ -564,7 +639,6 @@ def edit_info():
             return render_template("edit_info.html", data=data, CITIES=CITIES, success="Information updated successfully")
         else:
             return render_template("edit_info.html", data=data, CITIES=CITIES)
-
 # End of Settings Section
 
 

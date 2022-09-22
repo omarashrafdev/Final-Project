@@ -11,7 +11,7 @@ Home
 </a>
 <a href="/Patients" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">group</span>
-    <p>Patient list</p>
+    <p>Patient List</p>
 </a>
 <a href="/Settings" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">settings</span>
@@ -80,7 +80,10 @@ Home
     </tr>
     {% endfor %}
 </table>
-<a class="button" href="AddAppointment">Add Appointment</a>
+<div class="buttons">
+    <a class="button" href="AddPatient">Add Patient</a>
+    <a class="button" href="AddAppointment">Add Appointment</a>
+</div>
 
 <script>
     /*
@@ -196,6 +199,9 @@ td:last-child, th:last-child {
     border-radius: 50%;
 }
 
+.buttons {
+    display: flex;
+}
 .button {
     display: block;
     text-align: center;

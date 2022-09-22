@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block sidebar %}
+<a href="/" class="sidebar_active sidebar_hover sidebar_element">
+    <span class="material-icons md-48">speed</span>
+    <p>Dashboard</p>
+</a>
+<a href="/Patients" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">group</span>
+    <p>Patient List</p>
+</a>
+<a href="/Settings" class="sidebar_hover sidebar_element">
+    <span class="material-icons md-48">settings</span>
+    <p>Settings</p>
+</a>
+{% endblock %}
+
+{% block main %}
+<div id="title">
+    <div><span class="material-icons md-48">group</span></div>
+    <h1>Patient List</h1>
+</div>
+<hr>
+<form action="/AddPatient" method="post">
+    <h1>Add Patient</h1>
+    <br>
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+    <div>
+        <input type="text" class="text-field" name="name" placeholder="Name" required>
+    </div>
+    <div>
+        <input type="email" class="text-field" name="email" placeholder="Email Address" required>
+    </div>
+    <div>
+        <select class="text-field select" name="gender" required>
+            <option selected disabled>Select Your Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+    </div>
+    <div>
+        <input type="date" class="text-field" name="birthday" placeholder="Birthday" required>
+    </div>
+    <div>
+        <input type="number" class="text-field" name="phone_number" placeholder="Phone number" required>
+    </div>
+    <div>
+        <input type="text" class="text-field" name="address" placeholder="Address" required>
+    </div>
+    <div>
+        <select class="text-field select" name="city" required>
+            <option selected disabled>Select Your City</option>
+            {% for city in CITIES %}
+                <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <input type="number" class="text-field" name="postal_code" placeholder="Postal Code" required>
+    </div>
+    <div>
+        <input type="text" class="text-field" name="occupation" placeholder="Occupation" required>
+    </div>
+    <div>
+        <input class="text-field" name="picture" type="file" id="profile_pic" required>
+    </div>
+    <div>
+        <input class="button" type="submit" value="Add Appointment">
+    </div>
+</form>
+
+<script>
+    var fileInput = document.getElementById('profile_pic');
+    fileInput.onchange = function() {
+        var filePath = fileInput.value;
+        fileNameArray = filePath.split("\\");
+        fileName = fileNameArray[fileNameArray.length-1];
+    
+        // Allowed file types
+        var allowedExtensions =["jpg", "jpeg", "png"];
+        
+        fileExtention = getFileExtention(fileName);
+
+        if (fileExtention != allowedExtensions[0] && fileExtention != allowedExtensions[1] && fileExtention != allowedExtensions[2]) {
+            alert('Image file type is not supported\nOnly (jpg, jpeg, png) files are supported');
+            document.getElementById('file').value = null;
+        }
+    }
+
+    function getFileExtention(filename) {
+        return filename.split('.').pop();
+    }
+</script>
+{% endblock %}
+
+
+{% block style %}
+#title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 25px;
+}
+#title h1, #title div span {
+    font-size: 35px;
+}
+#title div span {
+    color: #0d53fc;
+    margin-right: 10px;
+}
+
+form {
+    margin-top: 20px;
+    margin-left: 25px;
+}
+.text-field {
+    width: 200px;
+    min-height: 20px;
+
+    padding: 10px;
+    margin-bottom: 10px;
+
+    border: 1px solid #0d53fc;
+    border-radius: 4px;
+}
+.select {
+    height: 40px;
+    width: 222px;
+}
+
+
+.button {
+    display: block;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    border-radius: 4px;
+    font-weight: 600;
+    margin: 0 10px;
+    width: 200px;
+    padding: 10px 0;
+    box-shadow: 0 0 20px rgba(13, 83, 252, 0.2);
+    transition: 0.4s;
+
+    color: rgb(104, 85, 224);
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px solid #0d53fc;
+}
+
+.button:hover {
+    color: white;
+    box-shadow: 0 0 20px rgba(13, 83, 252, 0.6);
+    background-color: #0d53fc;
+}
+{% endblock %}
