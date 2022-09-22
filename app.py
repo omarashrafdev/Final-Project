@@ -245,7 +245,9 @@ def logout():
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
 def patients():
-    patients = db.execute("SELECT * FROM users WHERE id IN (SELECT patient_id FROM appointments WHERE doctor_id=?) ORDER BY full_name", session["user_id"])
+    patients_id = db.execute("SELECT * FROM user_patients WHERE user_id=?", session["user_id"])
+    patients = db.execute("SELECT * FROM patients WHERE id=?", patients_id)
+    appointments = db.execute("SELECT * FROM WHERE")
 
     for patient in patients:
         # list of appointments for this patient
