@@ -5,11 +5,11 @@ Profile
 {% endblock %}
 
 {% block sidebar %}
-<a href="/" class="sidebar_active sidebar_hover sidebar_element">
+<a href="/" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">speed</span>
     <p>Dashboard</p>
 </a>
-<a href="/Patients" class="sidebar_hover sidebar_element">
+<a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
     <span class="material-icons md-48">group</span>
     <p>Patient List</p>
 </a>
@@ -22,20 +22,20 @@ Profile
 {% block main %}
 <div id="title">
     <div><span class="material-icons md-48">person</span></div>
-    <h1>{{ patient.full_name }}</h1>
+    <h1>{{ patient.name }}</h1>
 </div>
 <hr>
 <div id="links">
     <p><a href="/Patients" style="color: #0d53fc;">Patient List</a></p>
     <div><span class="material-icons md-48">arrow_forward_ios</span></div>
-    <p><a href="/Patients/Profile-{{ patient.id }}" style="color: #88949e;">{{ patient.full_name }}</a></p>
+    <p><a href="/Patients/Profile-{{ patient.id }}" style="color: #88949e;">{{ patient.name }}</a></p>
 </div>
 <hr>
 <section id="page">
     <div id="info_section">
         <div id="info1">
-            <div id="profile_pic"><img alt="Profile Picture" src="/static/media/patients/{{ patient.id }}.png"></div>
-            <h1 id="name">{{ patient.full_name }}</h1>
+            <div id="profile_pic"><img alt="Profile Picture" src="/{{patient.picture_path}}"></div>
+            <h1 id="name">{{ patient.name }}</h1>
             <a href="mailto:{{ patient.email }}"><h2 id="email">{{ patient.email }}</h2></a>
             <div id="appointments_numbers">
                 <div id="past_number">
@@ -56,8 +56,8 @@ Profile
                 <hr>
             </div>
             <div class="info2_element date_of_birth">
-                <h1>Date of Birth</h1>
-                <p>{{ patient.date_of_birth }}</p>
+                <h1>Birthday</h1>
+                <p>{{ patient.birthday }}</p>
                 <hr>
             </div>
             <div class="info2_element phone_number">
@@ -76,13 +76,8 @@ Profile
                 <hr>
             </div>
             <div class="info2_element zip">
-                <h1>ZIP Code</h1>
-                <p>{{ patient.zip }}</p>
-                <hr>
-            </div>
-            <div class="info2_element satus">
-                <h1>Member Satus</h1>
-                <p>{{ patient.status }}</p>
+                <h1>Postal Code</h1>
+                <p>{{ patient.postal_code }}</p>
                 <hr>
             </div>
             <div class="info2_element register_date">
@@ -158,6 +153,7 @@ Profile
 #files { grid-area: 2 / 4 / 3 / 5; }
 
 #info1 {
+    max-width: 240px;
     display: flex;
     flex-direction: column;
     align-items: center;

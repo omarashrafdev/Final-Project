@@ -26,16 +26,18 @@ Home
 </div>
 <hr>
 <form action="/AddAppointment" method="post">
+    <h1>Add Patient</h1>
+    <br>
     {% if error %}
     <div class="alert alert-danger">
         {{ error }}
     </div>
     {% endif %}
     <div>
-        <select class="text-field" style="height: 42px; width:222px;" required name="patient">
+        <select class="text-field" style="height: 42px; width:222px;" required name="link_id">
             <option value="" disabled selected>Select Patient</option>
             {% for patient in patients %}
-            <option id="patient" value="{{ patient.id }}">{{ patient.username }} − {{ patient.full_name }}</p></option>
+            <option id="patient" value="{{ patient.id }}">{{ patient.name }}</p></option>
             {% endfor %}
         </select>
     </div>
@@ -46,7 +48,7 @@ Home
         <input type="time" class="text-field" name="time" required>
     </div>
     <div>
-        <input type="number" class="text-field" name="fees" placeholder="Fees (Optinal)">
+        <input type="text" class="text-field" name="treatement" placeholder="Treatment">
     </div>
     <div>
         <textarea class="text-field" name="description" placeholder="Description (Optinal)" rows="5"></textarea>
@@ -55,7 +57,6 @@ Home
         <input class="button" type="submit" value="Add Appointment">
     </div>
 </form>
-{{ patients|length }}
 
 <script>
 </script>

@@ -5,11 +5,11 @@ Home
 {% endblock %}
 
 {% block sidebar %}
-<a href="/" class="sidebar_active sidebar_hover sidebar_element">
+<a href="/" class="sidebar_hover sidebar_element">
     <span class="material-icons md-48">speed</span>
     <p>Dashboard</p>
 </a>
-<a href="/Patients" class="sidebar_hover sidebar_element">
+<a href="/Patients" class="sidebar_active sidebar_hover sidebar_element">
     <span class="material-icons md-48">group</span>
     <p>Patient List</p>
 </a>
@@ -56,26 +56,28 @@ Home
     <thead>
         <td class="cell useless_cell"></td>
         <td class="cell" style="padding-left: 0;">Basic Info</td>
-        <td class="cell">Phone Number</td>
-        <td class="cell">City</td>
-        <td class="cell">Next Appointment</td>
-        <td class="cell">Last Appointment</td>
+        <!--<td class="cell">Phone Number</td>
+        <td class="cell">City</td>-->
+        <td class="cell" style="text-align: center;">Next Appointment</td>
+        <td class="cell" style="text-align: center;">Last Appointment</td>
+        <td class="cell">Register Date</td>
         <td class="cell"></td>
     </thead>
     {% for patient in patients %}
     <tr class="table_row">
         <td class="cell useless_cell"></td>
         <td class="basic_info cell" style="padding-left: 0;">
-            <div id="image_container"><a href="/Patients/Profile-{{ patient.id }}"><img src="/static/media/patients/{{ patient.id }}.png" alt="patient image"></a></div>
+            <div id="image_container"><a href="/Patients/Profile-{{ patient.id }}"><img src="/{{patient.picture_path}}" alt="patient image"></a></div>
             <div id="name_and_email">
-                <p><a href="/Patients/Profile-{{ patient.id }}"><b>{{patient.full_name}}</b></a></p>
-                <p><a href="mailto:{{patient.email}}">{{patient.email}}</a></p>
+                <p><a href="/Patients/Profile-{{ patient.id }}"><b>{{patient.name}}</b></a></p>
+                <p><a href="/Patients/Profile-{{ patient.id }}">{{patient.email}}</a></p>
             </div>
         </td>
-        <td class="cell"><a href="tel:{{patient.phone_number}}">{{patient.phone_number}}</a></td>
-        <td class="cell">{{patient.city}}</td>
-        <td class="cell">{{patient.next_appointment}}</td>
-        <td class="cell">{{patient.last_appointment}}</td>
+        <!--<td class="cell"><a href="tel:{{patient.phone_number}}">{{patient.phone_number}}</a></td>
+        <td class="cell">{{patient.city}}</td>-->
+        <td class="cell" style="text-align: center;">{{patient.next_appointment}}</td>
+        <td class="cell" style="text-align: center;">{{patient.last_appointment}}</td>
+        <td class="cell">{{patient.register_date}}</td>
         <td class="cell"><a href="/Patients/Delete-{{ patient.id }}"><span class="material-icons md-48">delete</span></a></td>
     </tr>
     {% endfor %}
@@ -170,16 +172,16 @@ thead td {
     color: #88949e;
 }
 td:first-child, th:first-child {
-    border-radius: 10px 0 0 10px;
+    border-radius: 5px 0 0 5px;
 }
 td:last-child, th:last-child {
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 5px 5px 0;
 }
 .table_row {
     background-color: #ffffff;
 }
 .cell {
-    padding: 5px 15px;
+    padding: 10px 5px;
 }
 .useless_cell {
     padding: 10px;

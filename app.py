@@ -69,7 +69,7 @@ CITIES = [
 
 # Today's date to pass to the forms
 TODAY = date.today()
-TIME = time.ctime(time.time()).split(" ")[4][:-3]
+TIME = time.ctime(time.time()).split(" ")[3][:-3]
 
 
 @app.route("/", methods=["GET"])
@@ -251,48 +251,29 @@ def logout():
 @app.route("/Patients", methods=["GET", "POST"])
 @login_required
 def patients():
-    # patients_id = db.execute("SELECT * FROM user_patients WHERE user_id=?", session["user_id"])
-    # patients = db.execute("SELECT * FROM patients WHERE id=?", patients_id)
-    # appointments = db.execute("SELECT * FROM WHERE")
-    '''
+    patients = db.execute("SELECT user_patients.id,name,email,phone_number,city,register_date,picture_path FROM user_patients INNER JOIN patients ON patients.id=user_patients.patient_id WHERE user_patients.user_id=? ORDER BY name", session["user_id"])
     for patient in patients:
-        # list of appointments for this patient
-        appointments = db.execute(
-            "SELECT * FROM appointments WHERE doctor_id=? AND patient_id=? ORDER BY date", session["user_id"], patient["id"])
+        next_appointment = db.execute("SELECT * FROM appointments WHERE link_id=? AND ((date=? AND time BETWEEN ? AND ?) OR (date>?)) ORDER BY date,time ASC LIMIT 1", 
+                                        patient["id"], TODAY, TIME, "23:59", TODAY)
+        last_appointment = db.execute("SELECT * FROM appointments WHERE link_id=? AND ((date=? AND time BETWEEN ? AND ?) OR (date<?)) ORDER BY date,time ASC LIMIT 1", 
+                                        patient["id"], TODAY, "00:00", TIME, TODAY)
+        
+        if len(next_appointment) == 0:
+            patient["next_appointment"] = "-"
+        else:
+            patient["next_appointment"] = next_appointment[0]["date"] + " " + next_appointment[0]["time"]
 
-        next_appointment_date = appointments[0]["date"]
-        next_appointment_time = appointments[0]["time"]
-
-        for i in range(len(appointments)):
-            if minutes_between(appointments[i]["date"], appointments[i]["time"], next_appointment_date, next_appointment_time) > 0:
-                if minutes_between(appointments[i]["date"], appointments[i]["time"], str(TODAY), str(TIME)) > 0:
-                    next_appointment_date = appointments[i]["date"]
-                    next_appointment_time = appointments[i]["time"]
-                    patient['next_appointment'] = appointments[i]["date"] + \
-                        " " + appointments[i]["time"]
-                    break
-                else:
-                    patient['last_appointment'] = appointments[i]["date"] + \
-                        " " + appointments[i]["time"]
-            else:
-                patient['last_appointment'] = appointments[i]["date"] + \
-                    " " + appointments[i]["time"]
-
-        if next_appointment_date == appointments[0]["date"] and next_appointment_time == appointments[0]["time"] and minutes_between(next_appointment_date, next_appointment_time, str(TODAY), str(TIME)) < 0:
-            patient['next_appointment'] = "-"
-
-    for i in range(len(patients)):
-        name = "static/media/patients/" + str(patients[i]["id"]) + ".png"
-        id = patients[i]["id"]
-        with open(name, "wb") as pic:
-            profile_binary = db.execute("SELECT profile_picture FROM users WHERE id=?", id)[
-                0]["profile_picture"]
-            pic.write(profile_binary)
-    '''
+        if len(last_appointment) == 0:
+            patient["last_appointment"] = "-"
+        else:
+            patient["last_appointment"] = last_appointment[0]["date"] + " " + last_appointment[0]["time"]
+    
     if request.method == "GET":
-        return render_template("patients.html", selected="name")
+        return render_template("patients.html", patients=patients, selected="name")
 
     else:
+        return render_template("patients.html", patients=patients, selected="name")
+
         sort_by = request.form.get("sort_by")
         if sort_by == "name":
             return render_template("patients.html", patients=patients, selected="name")
@@ -362,15 +343,11 @@ def patients():
 @app.route("/Patients/Profile-<int:id>")
 @login_required
 def patient_profile(id):
-    user_data = db.execute("SELECT * FROM users WHERE id=?", id)[0]
-    user_data["address"] = "El-badr st, 21"
-    user_data["zip"] = 32154
-    user_data["register_date"] = "2004-12-4"
-    user_data["status"] = "Active"
+    user_data = db.execute("SELECT * FROM patients WHERE id=?", id)[0]
     return render_template("patient_profile.html", patient=user_data)
 
 
-@app.route("/Patients/Delete-<int:id>")
+@app.route("/Patients/Delete-<int:id>", methods=["POST"])
 @login_required
 def delete_patient(id):
     db.execute("DELETE FROM appointments WHERE doctor_id=? AND patient_id=?",session["user_id"], id)
@@ -383,7 +360,6 @@ def add_patient():
     if request.method == "GET":
         return render_template("add_patient.html", CITIES=CITIES)
     else:
-        print("Begin")
         # Data input from the form
         name = request.form.get("name")
         email = request.form.get("email")
@@ -394,10 +370,7 @@ def add_patient():
         city = request.form.get("city")
         postal_code = request.form.get("postal_code")
         occupation = request.form.get("occupation")
-        print("Before Passed")
         picture = request.files['picture']
-        print("Passed")
-        
 
         # Validate name format
         # TODO
@@ -405,29 +378,30 @@ def add_patient():
         # Validate email duplication
         data = db.execute("SELECT * FROM patients WHERE email = ?", email)
         if len(data) != 0:
-            return render_template("add_patient.html", error="Email Address is already in use\nPlease try another one", CITIES=CITIES)
-        print("Passed")
+            error= "Email Address is already in use. Please try another one or <a href=\"/AddPatient/{}\">add</a> this patient to your account.".format()
+            return render_template("add_patient.html", error=error, add=data[0]["id"], CITIES=CITIES)
+        
         # Validate phone number duplication
         data = db.execute("SELECT * FROM patients WHERE phone_number = ?", phone_number)
         if len(data) != 0:
-            return render_template("add_patient.html", error="Phone number is already in use\nPlease try another one", CITIES=CITIES)
-        print("Passed")
+            return render_template("add_patient.html", error="Phone number is already in use. Please try another one.", CITIES=CITIES)
+        
         # Validate gender
-        if gender not in ["male", "female"]:
-            return render_template("add_patient.html", error="Non existing gender selected\nPlease try again", CITIES=CITIES)
-        print("Passed")
+        if gender not in ["Male", "Female"]:
+            return render_template("add_patient.html", error="Non existing gender selected. Please try again.", CITIES=CITIES)
+        
         # Validate city
         if city not in CITIES:
-            return render_template("add_patient.html", error="Non existing city selected\nPlease try again", CITIES=CITIES)
-        print("Passed")
+            return render_template("add_patient.html", error="Non existing city selected. Please try again.", CITIES=CITIES)
+        
         # Validate ZIP
         if len(postal_code) != 5:
-            return render_template("add_patient.html", error="Invalid postal code\nPlease try again", CITIES=CITIES)
-        print("Passed")
+            return render_template("add_patient.html", error="Invalid postal code. Please try again.", CITIES=CITIES)
+        
         # Validate image
         if imghdr.what(picture) not in ["jpg", "jpeg", "png"]:
-            return render_template("add_patient.html", error="Image file type is not supported\nOnly (jpg, jpeg, png) files are supported", CITIES=CITIES)
-        print("Passed")
+            return render_template("add_patient.html", error="Image file type is not supported. Only (jpg, jpeg, png) files are supported.", CITIES=CITIES)
+        
         # Store picture in the server
         hash_object = md5(str(generate_random_number()).encode()).hexdigest()
         picture_path = "static/media/pictures/{}.png".format(hash_object)
@@ -437,34 +411,45 @@ def add_patient():
         picture.save(picture_path)
 
         # Store user's data in the database
-        db.execute("Insert INTO patients (name, email, gender, birthday, phone_number, address, city, postal_code, occupation, register_date, picture_path) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        db.execute("INSERT INTO patients (name, email, gender, birthday, phone_number, address, city, postal_code, occupation, register_date, picture_path) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 name, email, gender, birthday, phone_number, address, city, postal_code, occupation, TODAY, picture_path)
-        
-        return render_template("add_patient.html", error="Success", CITIES=CITIES)
+        db.execute("INSERT INTO user_patients (user_id, patient_id) VALUES (?,(SELECT id FROM patients WHERE email=?))", session["user_id"], email)
 
+        return redirect("Patients")
+
+
+@app.route("/AddPatient/<id>", methods=["POST"])
+@login_required
+def AddExistingPatient():
+
+    return redirect("/Patients")
 
 
 @app.route("/AddAppointment", methods=["GET", "POST"])
 @login_required
 def add_appointment():
+    patients = db.execute("SELECT user_patients.id,name,picture_path FROM user_patients INNER JOIN patients ON patients.id=user_patients.patient_id WHERE user_patients.user_id=?", session["user_id"])
     if request.method == "GET":
-        return render_template("add_appointment.html")
+        return render_template("add_appointment.html", patients=patients)
     else:
+        link_id = request.form.get("link_id")
         date = request.form.get("date")
         time = request.form.get("time")
-        patient_id = request.form.get("patient")
-        fees = request.form.get("fees")
+        treatement = request.form.get("treatement")
         description = request.form.get("description")
+        print(link_id, date, time, treatement, description)
+        if not description:
+            description = ""
 
-        appointments = db.execute("SELECT time, date from appointments WHERE doctor_id = ? AND date = ?", session["user_id"], date)
+        appointments = db.execute("SELECT time, date from appointments WHERE link_id=? AND date=?", link_id, date)
         
         for appointment in appointments:
             if abs(minutes_between(date, time, appointment["date"], appointment["time"])) < 30:
-                error = "You can't add an appointment on this day at " + time + ". Because There's another appointment at " + appointment["time"]
-                return render_template("add_appointment.html", patients = patients, error = error)
+                error = "You can't add an appointment on this day at " + time + ". Because There's another appointment at " + appointment["time"] + "."
+                return render_template("add_appointment.html", patients=patients, error=error)
 
-        db.execute("INSERT INTO appointments (date, time, patient_id, doctor_id, fees, description) VALUES (?,?,?,?,?,?)",
-                   date, time, patient_id, session["user_id"], fees, description)
+        db.execute("INSERT INTO appointments (link_id, date, time, treatment, description) VALUES (?,?,?,?,?)",
+                   link_id, date, time, treatement, description)
 
         return redirect("/Patients")
 # End of Patient Section

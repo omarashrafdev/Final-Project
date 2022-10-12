@@ -1,7 +1,4 @@
-from hashlib import md5
-
-id = "0"
-
-hash_object = md5(id.encode()).hexdigest()
-
-print(hash_object)
+if 1==2 or (1==2 and 1==1):
+    print("Succeed")
+else:
+    print("Failed")

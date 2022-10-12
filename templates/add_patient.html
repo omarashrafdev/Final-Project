@@ -25,12 +25,12 @@ Home
     <h1>Patient List</h1>
 </div>
 <hr>
-<form action="/AddPatient" method="post">
+<form action="/AddPatient" method="post" enctype="multipart/form-data">
     <h1>Add Patient</h1>
     <br>
     {% if error %}
     <div class="alert alert-danger">
-        {{ error }}
+        {{ error }} {% if add %}<a href="/AddPatient/{{add}}">Add</a> this patient to your account.{% endif %}
     </div>
     {% endif %}
     <div>
@@ -42,8 +42,8 @@ Home
     <div>
         <select class="text-field select" name="gender" required>
             <option selected disabled>Select Your Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
         </select>
     </div>
     <div>

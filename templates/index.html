@@ -25,8 +25,8 @@ Home
     <h1>Dashboard</h1>
 </div>
 <hr>
-<div>
-    <h3>Hello, {{ session["name"] }}</h3>
+<div class="content">
+    <h1>Hello, {{ session["name"] }}.</h1>
 </div>
 {% endblock %}
 
@@ -43,5 +43,10 @@ Home
 #title div span {
     color: #0d53fc;
     margin-right: 10px;
+}
+
+.content {
+    margin-top: 20px;
+    margin-left: 25px;
 }
 {% endblock %}
