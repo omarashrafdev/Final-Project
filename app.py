@@ -4,7 +4,6 @@ import os
 import time
 import imghdr
 import traceback
-from turtle import pos
 
 # Import needed functions
 from flask import Flask, redirect, render_template, request, session, url_for
@@ -272,14 +271,12 @@ def patients():
         return render_template("patients.html", patients=patients, selected="name")
 
     else:
-        return render_template("patients.html", patients=patients, selected="name")
-
         sort_by = request.form.get("sort_by")
         if sort_by == "name":
             return render_template("patients.html", patients=patients, selected="name")
 
         elif sort_by == "next_appointment":
-            # Sorting by next_appointment
+            # Sorting by last_appointment
             sorted_patients = patients.copy()
             length = len(sorted_patients)
 
@@ -309,7 +306,6 @@ def patients():
             return render_template("patients.html", patients=sorted_patients, selected="next_appointment")
 
         elif sort_by == "last_appointment":
-            print("Sorting by: "+sort_by)
             # Sorting by last_appointment
             sorted_patients = patients.copy()
             length = len(sorted_patients)

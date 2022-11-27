@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: cs50
+Version: 9.2.2
+Summary: CS50 library for Python
+Home-page: https://github.com/cs50/python-cs50
+Author: CS50
+Author-email: sysadmins@cs50.harvard.edu
+License: GPLv3
+Keywords: cs50
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Flask (>=1.0)
+Requires-Dist: SQLAlchemy
+Requires-Dist: sqlparse
+Requires-Dist: termcolor
+Requires-Dist: wheel
+
+UNKNOWN
+
