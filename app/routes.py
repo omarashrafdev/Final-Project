@@ -9,13 +9,13 @@ create_tables()
 def index():
     return render_template('index.html')
 
-@app.route('/patient-list')
-def index():
-    return render_template('index.html')
+# @app.route('/patient-list')
+# def index():
+#     return render_template('index.html')
 
-@app.route('/appointments')
-def index():
-    return render_template('index.html')
+# @app.route('/appointments')
+# def index():
+#     return render_template('index.html')
 
 @app.route('/users')
 def users():
