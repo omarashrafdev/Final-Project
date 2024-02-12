@@ -2,3 +2,4 @@ __pycache__/
 .github/
 .vscode/
 flask_session/
+.venv/

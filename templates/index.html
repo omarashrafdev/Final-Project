@@ -1,52 +1,33 @@
-{% extends "layout.html" %}
-
-{% block title %}
-Home
-{% endblock %}
-
-{% block sidebar %}
-<a href="/" class="sidebar_active sidebar_hover sidebar_element">
-    <span class="material-icons md-48">speed</span>
-    <p>Dashboard</p>
-</a>
-<a href="/Patients" class="sidebar_hover sidebar_element">
-    <span class="material-icons md-48">group</span>
-    <p>Patient List</p>
-</a>
-<a href="/Settings" class="sidebar_hover sidebar_element">
-    <span class="material-icons md-48">settings</span>
-    <p>Settings</p>
-</a>
-{% endblock %}
-
 {% block main %}
-<div id="title">
-    <div><span class="material-icons md-48">speed</span></div>
-    <h1>Dashboard</h1>
-</div>
-<hr>
-<div class="content">
-    <h1>Hello, {{ session["name"] }}.</h1>
-</div>
-{% endblock %}
+<nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarsExampleDefault"
+    aria-controls="navbarsExampleDefault"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-{% block style %}
-#title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 10px 25px;
-}
-#title h1, #title div span {
-    font-size: 35px;
-}
-#title div span {
-    color: #0d53fc;
-    margin-right: 10px;
-}
-
-.content {
-    margin-top: 20px;
-    margin-left: 25px;
-}
-{% endblock %}
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+{% endblock %}{% block style %} /* Sidebar Styles */ .sidebar { position: fixed;
+top: 0; bottom: 0; left: 0; z-index: 100; padding: 48px 0 0; /* Height of navbar
+*/ box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1); } .sidebar-sticky { position:
+relative; top: 0; height: calc(100vh - 48px); padding-top: .5rem; overflow-x:
+hidden; overflow-y: auto; /* Scrollable contents if viewport is shorter than
+content. */ } @supports ((position: -webkit-sticky) or (position: sticky)) {
+.sidebar-sticky { position: -webkit-sticky; position: sticky; } } /* Sidebar
+navigation */ .nav-link { font-weight: 500; color: rgba(0, 0, 0, .7); }
+.nav-link:hover { color: rgba(0, 0, 0, .9); } .nav-link.active { color: #007bff;
+} {% endblock %}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}CLIMAN{% endblock %}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div class="flex md:h-screen flex-col md:flex-row">
+      <!-- Sidebar -->
+      <div
+        class="md:flex-shrink-0 md:block flex flex-row place-content-around items-center order-last md:order-first md:block md:w-64 w-full bg-white md:shadow"
+      >
+        <!-- Fix centering caused by block class -->
+        <div
+          class="flex hidden items-center justify-center md:block h-20 md:border-b"
+        >
+          <img
+            src="{{ url_for('static', filename='media/logo-text-color.png') }}"
+            alt="CLIMAN Logo"
+            class="h-10"
+          />
+        </div>
+        <div
+          class="flex md:hidden items-center justify-center h-20 md:border-b"
+        >
+          <img
+            src="{{ url_for('static', filename='media/logo.png') }}"
+            alt="CLIMAN Logo"
+            class="h-10"
+          />
+        </div>
+        <a
+          href="#"
+          class="block py-2 px-4 font-bold text-gray-600 hover:bg-gray-200 flex items-center"
+        >
+          <span class="material-symbols-outlined md:text-xl md:mr-2"
+            >dashboard</span
+          >
+          <p class="hidden md:block">Dashboard</p>
+        </a>
+        <a
+          href="#"
+          class="block py-2 px-4 font-bold text-gray-600 hover:bg-gray-200 flex items-center"
+        >
+          <span class="material-symbols-outlined md:text-xl md:mr-2"
+            >group</span
+          >
+          <p class="hidden md:block">Patient List</p>
+        </a>
+        <a
+          href="#"
+          class="block py-2 px-4 font-bold text-gray-600 hover:bg-gray-200 flex items-center"
+        >
+          <span class="material-symbols-outlined md:text-xl md:mr-2"
+            >calendar_month</span
+          >
+          <p class="hidden md:block">Appointments</p>
+        </a>
+        <div class="md:absolute bottom-0 md:w-full">
+          <div class="p-4 md:border-t">
+            <div class="flex items-center space-x-4">
+              <img
+                src="{{ url_for('static', filename='media/omar.png') }}"
+                alt="User Avatar"
+                class="w-8 h-8 rounded-full"
+              />
+              <div class="hidden md:block">
+                <div class="text-sm font-semibold">Omar Ashraf</div>
+                <div class="text-xs text-gray-500">
+                  omar.ashraf.dev@gmail.com
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /Sidebar -->
+
+      <!-- Main content -->
+      <div class="flex-1">{% block content %}{% endblock %}</div>
+      <!-- /Main content -->
+    </div>
+  </body>
+</html>
