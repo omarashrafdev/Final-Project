@@ -16,9 +16,8 @@
       <div
         class="md:flex-shrink-0 md:block flex flex-row place-content-around items-center order-last md:order-first md:block md:w-64 w-full bg-white md:shadow fixed md:relative bottom-0 md:left-0 md:top-0 md:h-full"
       >
-        <!-- Fix centering caused by block class -->
         <div
-          class="flex hidden items-center justify-center md:block h-20 md:border-b"
+          class="flex hidden items-center justify-center md:flex h-20 md:border-b"
         >
           <img
             src="{{ url_for('static', filename='media/logo-text-color.png') }}"
@@ -66,15 +65,20 @@
           <div class="p-4 md:border-t">
             <div class="flex items-center space-x-4">
               <img
-                src="{{ url_for('static', filename='media/omar.png') }}"
+                src="{{ url_for('static', filename=picture_path) }}"
                 alt="User Avatar"
                 class="w-8 h-8 rounded-full"
               />
               <div class="hidden md:block">
-                <div class="text-sm font-semibold">Omar Ashraf</div>
-                <div class="text-xs text-gray-500">
-                  omar.ashraf.dev@gmail.com
-                </div>
+                <div class="text-sm font-semibold">{{name}}</div>
+                <div class="text-xs text-gray-500">{{email}}</div>
+              </div>
+              <div class="hidden md:block">
+                <a href="/logout">
+                  <span class="material-symbols-outlined md:text-xl md:mr-2"
+                    >logout</span
+                  ></a
+                >
               </div>
             </div>
           </div>

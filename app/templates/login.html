@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login</title>
+  </head>
+  <body class="bg-gray-100 flex justify-center items-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+      <form action="/login" method="POST">
+        <div class="mb-4">
+          <img
+            src="{{ url_for('static', filename='media/logo-text-color.png') }}"
+            alt="Climan Logo"
+            class="w-48 mx-auto"
+          />
+        </div>
+        {% if error %}
+        <div class="mb-4 text-red-500 text-center">{{ error }}</div>
+        {% endif %}
+        <div class="mb-4">
+          <input
+            required
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="login_email"
+            type="email"
+            name="login_email"
+            placeholder="Email"
+          />
+        </div>
+        <div class="mb-4">
+          <input
+            required
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="login_password"
+            type="password"
+            name="login_password"
+            placeholder="Password"
+          />
+        </div>
+        <div class="mb-4 flex flex-col items-center">
+          <button
+            type="submit"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            Login
+          </button>
+        </div>
+        <div class="text-center">
+          <a href="/register" class="text-gray-400 hover:text-blue-500"
+            >Create an account</a
+          >
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

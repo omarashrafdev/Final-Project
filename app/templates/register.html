@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Register</title>
+  </head>
+  <body class="bg-gray-100 flex justify-center items-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+      <form action="/register" method="POST" enctype="multipart/form-data">
+        <div class="mb-4">
+          <img
+            src="{{ url_for('static', filename='media/logo-text-color.png') }}"
+            alt="Climan Logo"
+            class="w-64 mx-auto"
+          />
+        </div>
+        {% if error %}
+        <div class="mb-4 text-red-500 text-center">{{ error }}</div>
+        {% endif %}
+        <div class="mb-4">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="full_name"
+            type="text"
+            name="full_name"
+            placeholder="Full Name"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="email"
+            type="email"
+            name="email"
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <select
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="gender"
+            name="gender"
+            required
+          >
+            <option value="" disabled selected>Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="phone_number"
+            type="tel"
+            name="phone_number"
+            placeholder="Phone Number"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="city"
+            type="text"
+            name="city"
+            placeholder="City"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="date_of_birth"
+            type="date"
+            name="date_of_birth"
+            placeholder="Date of Birth"
+            required
+          />
+        </div>
+        <div class="mb-4 flex flex-col items-center text-center">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="picture_path"
+            type="file"
+            name="picture_path"
+            accept="image/*"
+            required
+          />
+          <!-- <label
+            for="picture_path"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-600"
+          >
+            Upload Profile Picture
+          </label> -->
+        </div>
+        <div class="mb-4 flex flex-row gap-1">
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="password"
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <input
+            class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+            id="confirm_password"
+            type="password"
+            name="confirm_password"
+            placeholder="Confirm Password"
+            required
+          />
+        </div>
+        <div class="mb-4 flex flex-col items-center">
+          <button
+            type="submit"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 mx-auto"
+          >
+            Register
+          </button>
+        </div>
+        <div class="text-center">
+          <a href="/login" class="text-gray-400 hover:text-blue-500"
+            >Already have an account?</a
+          >
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
