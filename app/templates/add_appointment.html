@@ -1,0 +1,66 @@
+{% extends 'layout.html' %} {% block title %}CLIMAN Dashboard{% endblock %} {%
+block content %}
+<div class="p-5">
+  <div class="bg-white p-8 rounded-lg shadow-lg">
+    <form action="/appointments/add" method="POST">
+      <div class="mb-4">
+        <p class="text-3xl">Add appointment</p>
+      </div>
+      {% if error %}
+      <div class="mb-4 text-red-500 text-center">{{ error }}</div>
+      {% endif %}
+      <div class="mb-4">
+        <input
+          required
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+          id="treatment"
+          type="text"
+          name="treatment"
+          placeholder="Treatment"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          required
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+          id="date"
+          type="date"
+          name="date"
+          placeholder="Date"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          required
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+          id="time"
+          type="time"
+          name="time"
+          placeholder="Time"
+        />
+      </div>
+      <div class="mb-4">
+        <select
+          required
+          name="patient_id"
+          id="patient_id"
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+        >
+          <option value="LOL" disabled>Select patient</option>
+          {% for patient in patients %}
+          <option value="{{ patient.id }}">{{ patient.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-4 flex flex-col items-center">
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+        >
+          Add
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

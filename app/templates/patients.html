@@ -1,0 +1,47 @@
+{% extends 'layout.html' %} {% block title %}Patient List{% endblock %} {% block
+content %} {% set current_page = "patients" %}
+<div class="p-5">
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-semibold mb-4">Patients</h1>
+    <a href="/patients/add">Add ➕</a>
+  </div>
+
+  <table class="w-full border-collapse border border-gray-300">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">Name</th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">Email</th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">
+          Date of birth
+        </th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">
+          Register date
+        </th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for patient in patients %}
+      <tr>
+        <td class="px-4 py-2 border border-gray-300">
+          {{ patient.full_name }}
+        </td>
+        <td class="px-4 py-2 border border-gray-300">{{ patient.email }}</td>
+        <td class="px-4 py-2 border border-gray-300">
+          {{ patient.date_of_birth }}
+        </td>
+        <td class="px-4 py-2 border border-gray-300">
+          {{ patient.register_date }}
+        </td>
+        <td class="px-4 py-2 border border-gray-300">
+          <form method="post" action="/patients/delete">
+            <input name="id" value="{{ patient.id }}" class="hidden" />
+            <button>❌</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

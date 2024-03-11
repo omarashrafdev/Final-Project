@@ -1,0 +1,43 @@
+{% extends 'layout.html' %} {% block title %}Patient List{% endblock %} {% block
+content %} {% set current_page = "patients" %}
+<div class="p-5">
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-semibold mb-4">Appointments</h1>
+    <a href="/appointments/add">Add ➕</a>
+  </div>
+
+  <table class="w-full border-collapse border border-gray-300">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">Patient</th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">Treatment</th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">
+          Date & Time
+        </th>
+        <th class="px-4 py-2 bg-gray-200 border border-gray-300">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for appointment in appointments %}
+      <tr>
+        <td class="px-4 py-2 border border-gray-300">
+          {{ appointment.full_name }}
+        </td>
+        <td class="px-4 py-2 border border-gray-300">
+          {{ appointment.treatment }}
+        </td>
+        <td class="px-4 py-2 border border-gray-300">
+          {{ appointment.date }} - {{ appointment.time }}
+        </td>
+        <td class="px-4 py-2 border border-gray-300">
+          <form method="post" action="/appointments/delete">
+            <input name="id" value="{{ appointment.id }}" class="hidden" />
+            <button>❌</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

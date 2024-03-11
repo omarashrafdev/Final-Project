@@ -3,7 +3,7 @@ import os
 from random import randint
 from flask import render_template, request, redirect, url_for, session
 from app import app
-from app.models import db, create_tables, add_user, get_user_by_email, get_user_by_phone_number
+from app.models import *
 from werkzeug.security import generate_password_hash
 
 from app.utils.helpers import login_required, user_login
@@ -15,7 +15,10 @@ create_tables()
 @login_required
 @app.route('/')
 def index():
-    return render_template('index.html', name=session['full_name'], email=session['email'], picture=session['picture_path'])
+    if 'full_name' in session:
+        return render_template('index.html', name=session['full_name'], email=session['email'])
+    else:
+        return redirect('/login')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -43,21 +46,11 @@ def register():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
         full_name = request.form.get("full_name")
-        gender = request.form.get("gender")
-        phone_number = request.form.get("phone_number")
-        city = request.form.get("city")
-        date_of_birth = request.form.get("date_of_birth")
-        picture = request.files['picture_path']
 
         # Check if email already exists
         existing_user = get_user_by_email(email)
         if existing_user:
             return render_template("register.html", error="Email already exists. Please choose a different one.")
-
-        # Check if phone number exists
-        existing_user = get_user_by_phone_number(phone_number)
-        if existing_user:
-            return render_template("register.html", error="Phone number already exists. Please choose a different one.")
 
         # Check if passwords match
         if password != confirm_password:
@@ -66,22 +59,10 @@ def register():
         # Hash the password
         password_hash = generate_password_hash(password)
 
-        # Store picture in the server
-        hash_object = md5(str(randint(111111, 999999)).encode()).hexdigest()
-        picture_path = "app/static/media/pictures/{}.png".format(hash_object)
-        while os.path.exists(picture_path):
-            hash_object = md5(
-                str(randint(111111, 999999)).encode()).hexdigest()
-            picture_path = "app/static/media/pictures/{}.png".format(
-                hash_object)
-        picture.save(picture_path)
-        media_picture_path = '/'.join(picture_path.split('/')[3:])
-
         # Add user to the database
-        add_user(email, password_hash, full_name, gender,
-                 phone_number, city, date_of_birth, media_picture_path)
+        add_user(email, password_hash, full_name)
 
-        return redirect(url_for("login"))
+        return redirect("/login")
 
 
 @app.route('/logout', methods=['GET'])
@@ -90,21 +71,71 @@ def logout():
     session.clear()
 
     # Redirect the user to the login page
-    return redirect(url_for('login'))
+    return redirect("/login")
 
 
-@app.route('/patient-list')
-def patient_list():
-    # TODO: Get user id from session data
-    user_id = 1
-    patient_list = db.execute(
-        "SELECT * FROM patients WHERE user_id=?", user_id)
-    return render_template('patient_list.html', patient_list=patient_list)
+@app.route('/patients')
+def patients():
+    if 'full_name' in session:
+        patients = get_patients(session['user_id'])
+        return render_template('patients.html', patients=patients, name=session['full_name'])
+    else:
+        return redirect('/login')
 
 
-@app.route('/users')
-def users():
-    users = db.execute("SELECT * FROM users")
-    return render_template('users.html', users=users)
+@app.route('/patients/add', methods=['GET', 'POST'])
+def add_patient():
+    if 'full_name' in session:
+        if request.method == "GET":
+            return render_template('add_patient.html', name=session['full_name'])
+        else:
+            full_name = request.form.get("full_name")
+            email = request.form.get("email")
+            date_of_birth = request.form.get("date_of_birth")
 
-# Add more routes as needed
+            create_patient(full_name, email, date_of_birth, session['user_id'])
+
+            return redirect('/patients')
+    else:
+        return redirect('/login')
+
+
+@app.route('/patients/delete', methods=['POST'])
+def remove_patient():
+    if 'full_name' in session:
+        patient_id = request.form.get("id")
+        delete_patient(session['user_id'], patient_id)
+        return redirect('/patients')
+    else:
+        return redirect('/login')
+
+
+@app.route('/appointments')
+def appointments():
+    if 'full_name' in session:
+        appointments = get_all_appointments(session['user_id'])
+        return render_template('appointments.html', appointments=appointments, name=session['full_name'])
+    else:
+        return redirect('/login')
+
+
+@app.route('/appointments/add', methods=['GET', 'POST'])
+def add_appointment():
+    if 'full_name' in session:
+        patients = get_patients(session['user_id'])
+        if request.method == "GET":
+            return render_template('add_appointment.html', patients=patients, name=session['full_name'])
+        else:
+            try:
+                treatment = request.form.get("treatment")
+                date = request.form.get("date")
+                time = request.form.get("time")
+                patient_id = request.form.get("patient_id")
+                create_appointment(date, time, treatment,
+                                   session['user_id'], patient_id)
+                return redirect('/appointments')
+            except Exception as e:
+                print(e)  # Print the exception for debugging
+                return render_template('add_appointment.html', patients=patients, error="An error occurred. Please try again.")
+    else:
+        return redirect('/login')

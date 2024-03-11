@@ -1,0 +1,53 @@
+{% extends 'layout.html' %} {% block title %}CLIMAN Dashboard{% endblock %} {%
+block content %}
+<div class="p-5">
+  <div class="bg-white p-8 rounded-lg shadow-lg">
+    <form action="/patients/add" method="POST">
+      <div class="mb-4">
+        <p class="text-3xl">Add patient</p>
+      </div>
+      {% if error %}
+      <div class="mb-4 text-red-500 text-center">{{ error }}</div>
+      {% endif %}
+      <div class="mb-4">
+        <input
+          required
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+          id="full_name"
+          type="text"
+          name="full_name"
+          placeholder="Full Name"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          required
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+          id="email"
+          type="email"
+          name="email"
+          placeholder="Email"
+        />
+      </div>
+      <div class="mb-4">
+        <input
+          required
+          class="border border-gray-300 rounded-md px-3 py-2 w-full focus:outline-none focus:ring focus:border-blue-500"
+          id="date_of_birth"
+          type="date"
+          name="date_of_birth"
+          placeholder="Date of birth"
+        />
+      </div>
+      <div class="mb-4 flex flex-col items-center">
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+        >
+          Add
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
